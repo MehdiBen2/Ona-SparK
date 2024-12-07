@@ -69,16 +69,25 @@ blida_incidents = [
 
 def add_blida_incidents():
     with app.app_context():
-        # Get the Blida unit
-        blida_unit = Unit.query.filter_by(name='Unité de Blida').first()
+        # Print all units and users for debugging
+        print("\nAll Units:")
+        for unit in Unit.query.all():
+            print(f"ID: {unit.id}, Name: {unit.name}")
+        
+        print("\nAll Users:")
+        for user in User.query.all():
+            print(f"ID: {user.id}, Username: {user.username}, Unit ID: {user.unit_id}")
+
+        # Get the Blida unit by ID
+        blida_unit = Unit.query.get(3)
         if not blida_unit:
-            print("Error: Unité de Blida not found")
+            print("Error: Unit with ID 3 not found")
             return
 
-        # Get a user from Blida unit to associate with incidents
-        blida_user = User.query.filter_by(unit_id=blida_unit.id).first()
+        # Get user U_Blida
+        blida_user = User.query.filter_by(username='U_Blida').first()
         if not blida_user:
-            print("Error: No user found for Unité de Blida")
+            print("Error: User U_Blida not found")
             return
 
         # Add each incident

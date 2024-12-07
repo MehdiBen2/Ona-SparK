@@ -2,46 +2,139 @@
 
 {% block content %}
 <div class="container-fluid mt-4">
-    <div class="row">
+    <!-- Header Section -->
+    <div class="row mb-4">
         <div class="col-12">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">User Profiles</h4>
-                    <div class="d-flex">
-                        <a href="{{ url_for('manage_units') }}" class="btn btn-light me-2">
-                            <i class="fas fa-building"></i> Gérer les Unités
-                        </a>
-                        <input type="text" id="searchInput" class="form-control me-2" placeholder="Search profiles...">
-                        <button class="btn btn-light" onclick="refreshTable()">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-users-gear me-2 text-primary"></i>
+                    <span class="gradient-text">User Profiles</span>
+                </h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                        <li class="breadcrumb-item active">User Profiles</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 rounded-lg">
+                <div class="card-body p-3">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="search-wrapper">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" id="searchInput" class="form-control search-input" 
+                                       placeholder="Search by name, email, or job function...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select" id="unitFilter">
+                                <option value="">All Units</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select" id="jobFilter">
+                                <option value="">All Job Functions</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="date" class="form-control" id="dateFilter" placeholder="Recruitment Date">
+                        </div>
+                        <div class="col-md-2">
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('manage_units') }}" class="btn btn-outline-primary flex-grow-1">
+                                    <i class="fas fa-building me-1"></i> Units
+                                </a>
+                                <button class="btn btn-primary" onclick="refreshTable()" id="refreshBtn">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="card-body">
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 rounded-lg">
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover" id="profilesTable">
-                            <thead>
+                        <table class="table table-hover align-middle mb-0" id="profilesTable">
+                            <thead class="bg-light">
                                 <tr>
-                                    <th onclick="sortTable(0)">Name <i class="fas fa-sort"></i></th>
-                                    <th onclick="sortTable(1)">Email <i class="fas fa-sort"></i></th>
-                                    <th onclick="sortTable(2)">Professional Number <i class="fas fa-sort"></i></th>
-                                    <th onclick="sortTable(3)">Job Function <i class="fas fa-sort"></i></th>
-                                    <th onclick="sortTable(4)">Unit <i class="fas fa-sort"></i></th>
-                                    <th onclick="sortTable(5)">Recruitment Date <i class="fas fa-sort"></i></th>
-                                    <th>Actions</th>
+                                    <th class="px-4 py-3" onclick="sortTable(0)">
+                                        <div class="d-flex align-items-center">
+                                            Name <i class="fas fa-sort ms-2"></i>
+                                        </div>
+                                    </th>
+                                    <th class="px-4 py-3" onclick="sortTable(1)">
+                                        <div class="d-flex align-items-center">
+                                            Email <i class="fas fa-sort ms-2"></i>
+                                        </div>
+                                    </th>
+                                    <th class="px-4 py-3" onclick="sortTable(2)">
+                                        <div class="d-flex align-items-center">
+                                            Professional Number <i class="fas fa-sort ms-2"></i>
+                                        </div>
+                                    </th>
+                                    <th class="px-4 py-3" onclick="sortTable(3)">
+                                        <div class="d-flex align-items-center">
+                                            Job Function <i class="fas fa-sort ms-2"></i>
+                                        </div>
+                                    </th>
+                                    <th class="px-4 py-3" onclick="sortTable(4)">
+                                        <div class="d-flex align-items-center">
+                                            Unit <i class="fas fa-sort ms-2"></i>
+                                        </div>
+                                    </th>
+                                    <th class="px-4 py-3" onclick="sortTable(5)">
+                                        <div class="d-flex align-items-center">
+                                            Recruitment Date <i class="fas fa-sort ms-2"></i>
+                                        </div>
+                                    </th>
+                                    <th class="px-4 py-3 text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for profile in profiles %}
-                                <tr>
-                                    <td>{{ profile.first_name }} {{ profile.last_name }}</td>
-                                    <td>{{ profile.email }}</td>
-                                    <td>{{ profile.professional_number }}</td>
-                                    <td>{{ profile.job_function }}</td>
-                                    <td>{{ profile.user.unit.name if profile.user.unit else 'N/A' }}</td>
-                                    <td>{{ profile.recruitment_date.strftime('%Y-%m-%d') }}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-info" onclick="viewProfile({{ profile.id }})">
+                                <tr class="border-bottom">
+                                    <td class="px-4 py-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle bg-primary text-white me-2">
+                                                {{ profile.first_name[0] }}{{ profile.last_name[0] }}
+                                            </div>
+                                            <div>
+                                                {{ profile.first_name }} {{ profile.last_name }}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3">{{ profile.email }}</td>
+                                    <td class="px-4 py-3">{{ profile.professional_number }}</td>
+                                    <td class="px-4 py-3">
+                                        <span class="badge bg-light text-dark">
+                                            {{ profile.job_function }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span class="badge bg-primary-subtle text-primary">
+                                            {{ profile.user.unit.name if profile.user.unit else 'N/A' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3">{{ profile.recruitment_date.strftime('%Y-%m-%d') }}</td>
+                                    <td class="px-4 py-3 text-center">
+                                        <button class="btn btn-sm btn-primary" 
+                                                onclick="viewProfile({{ profile.id }})"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-title="View Profile">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </td>
@@ -56,14 +149,156 @@
     </div>
 </div>
 
+<style>
+.gradient-text {
+    background: linear-gradient(45deg, #2196F3, #1976D2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 600;
+}
+
+.search-wrapper {
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+}
+
+.search-input {
+    padding-left: 35px;
+    border-radius: 8px;
+}
+
+.avatar-circle {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.card {
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.table th {
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.table th:hover {
+    background-color: #f8f9fa;
+}
+
+.table td {
+    font-size: 0.875rem;
+}
+
+.table tr {
+    transition: background-color 0.2s ease;
+}
+
+.table tbody tr:nth-child(odd) {
+    background-color: #fcfcfc;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.btn {
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #2196F3, #1976D2);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(45deg, #1976D2, #1565C0);
+}
+
+.badge {
+    padding: 0.5em 0.75em;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 6px;
+    letter-spacing: 0.3px;
+    transition: all 0.2s ease;
+}
+
+.badge.bg-light {
+    background-color: #e3f2fd !important;
+    border: 1px solid #378fd8;
+}
+
+.badge.bg-primary-subtle {
+    background-color: #e3f2fd !important;
+    border: 1px solid #008cff;
+}
+
+.badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.fa-sync-alt.spinning {
+    animation: spin 1s linear infinite;
+}
+</style>
+
 <script>
 let sortDirection = 1;
 let lastSortedColumn = -1;
+
+// Initialize tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltips.forEach(tooltip => new bootstrap.Tooltip(tooltip));
+    
+    // Populate filters
+    populateFilters();
+});
 
 function sortTable(columnIndex) {
     const table = document.getElementById('profilesTable');
     const tbody = table.getElementsByTagName('tbody')[0];
     const rows = Array.from(tbody.getElementsByTagName('tr'));
+    
+    // Update sort icons
+    const headers = table.getElementsByTagName('th');
+    for (let i = 0; i < headers.length; i++) {
+        const icon = headers[i].querySelector('.fas');
+        if (i === columnIndex) {
+            icon.className = `fas fa-sort-${sortDirection === 1 ? 'down' : 'up'} ms-2`;
+        } else {
+            icon.className = 'fas fa-sort ms-2';
+        }
+    }
 
     if (lastSortedColumn === columnIndex) {
         sortDirection *= -1;
@@ -95,42 +330,127 @@ function debounce(func, wait) {
 
 const searchProfiles = debounce(async () => {
     const searchQuery = document.getElementById('searchInput').value;
+    const unitFilter = document.getElementById('unitFilter').value;
+    const jobFilter = document.getElementById('jobFilter').value;
+    const dateFilter = document.getElementById('dateFilter').value;
+
     try {
-        const response = await fetch(`/api/profiles/search?q=${encodeURIComponent(searchQuery)}`);
+        const params = new URLSearchParams({
+            q: searchQuery,
+            unit: unitFilter,
+            job: jobFilter,
+            date: dateFilter
+        });
+        
+        const response = await fetch(`/api/profiles/search?${params}`);
         const profiles = await response.json();
         updateTable(profiles);
     } catch (error) {
         console.error('Error searching profiles:', error);
+        showToast('Error searching profiles', 'error');
     }
 }, 300);
 
-document.getElementById('searchInput').addEventListener('input', searchProfiles);
+// Add event listeners for all filters
+['searchInput', 'unitFilter', 'jobFilter', 'dateFilter'].forEach(id => {
+    document.getElementById(id).addEventListener('input', searchProfiles);
+});
 
 function updateTable(profiles) {
     const tbody = document.querySelector('#profilesTable tbody');
     tbody.innerHTML = profiles.map(profile => `
-        <tr>
-            <td>${profile.first_name} ${profile.last_name}</td>
-            <td>${profile.email}</td>
-            <td>${profile.professional_number}</td>
-            <td>${profile.job_function}</td>
-            <td>${profile.unit || 'N/A'}</td>
-            <td>${new Date(profile.recruitment_date).toLocaleDateString()}</td>
-            <td>
-                <button class="btn btn-sm btn-info" onclick="viewProfile(${profile.id})">
+        <tr class="border-bottom">
+            <td class="px-4 py-3">
+                <div class="d-flex align-items-center">
+                    <div class="avatar-circle bg-primary text-white me-2">
+                        ${profile.first_name[0]}${profile.last_name[0]}
+                    </div>
+                    <div>
+                        ${profile.first_name} ${profile.last_name}
+                    </div>
+                </div>
+            </td>
+            <td class="px-4 py-3">${profile.email}</td>
+            <td class="px-4 py-3">${profile.professional_number}</td>
+            <td class="px-4 py-3">
+                <span class="badge bg-light text-dark">
+                    ${profile.job_function}
+                </span>
+            </td>
+            <td class="px-4 py-3">
+                <span class="badge bg-primary-subtle text-primary">
+                    ${profile.unit || 'N/A'}
+                </span>
+            </td>
+            <td class="px-4 py-3">${new Date(profile.recruitment_date).toLocaleDateString()}</td>
+            <td class="px-4 py-3 text-center">
+                <button class="btn btn-sm btn-primary" 
+                        onclick="viewProfile(${profile.id})"
+                        data-bs-toggle="tooltip"
+                        data-bs-title="View Profile">
                     <i class="fas fa-eye"></i>
                 </button>
             </td>
         </tr>
     `).join('');
+    
+    // Reinitialize tooltips for new elements
+    const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltips.forEach(tooltip => new bootstrap.Tooltip(tooltip));
 }
 
 function viewProfile(profileId) {
     window.location.href = `{{ url_for('profiles.view_user_profile', user_id=0) }}`.replace('0', profileId);
 }
 
-function refreshTable() {
-    window.location.reload();
+async function refreshTable() {
+    const refreshBtn = document.getElementById('refreshBtn');
+    const icon = refreshBtn.querySelector('i');
+    icon.classList.add('spinning');
+    refreshBtn.disabled = true;
+
+    try {
+        const response = await fetch('/api/profiles/all');
+        const profiles = await response.json();
+        updateTable(profiles);
+        showToast('Profiles refreshed successfully', 'success');
+    } catch (error) {
+        console.error('Error refreshing profiles:', error);
+        showToast('Error refreshing profiles', 'error');
+    } finally {
+        setTimeout(() => {
+            icon.classList.remove('spinning');
+            refreshBtn.disabled = false;
+        }, 500);
+    }
+}
+
+async function populateFilters() {
+    try {
+        const response = await fetch('/api/profiles/filters');
+        const { units, jobFunctions } = await response.json();
+        
+        const unitSelect = document.getElementById('unitFilter');
+        const jobSelect = document.getElementById('jobFilter');
+        
+        units.forEach(unit => {
+            unitSelect.add(new Option(unit.name, unit.id));
+        });
+        
+        jobFunctions.forEach(job => {
+            jobSelect.add(new Option(job, job));
+        });
+    } catch (error) {
+        console.error('Error populating filters:', error);
+    }
+}
+
+function showToast(message, type = 'info') {
+    // Assuming you have a toast component in your base template
+    const toast = new bootstrap.Toast(document.getElementById('toast'));
+    const toastBody = document.querySelector('.toast-body');
+    toastBody.textContent = message;
+    toast.show();
 }
 </script>
 {% endblock %}
