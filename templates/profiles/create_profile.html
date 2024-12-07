@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0 text-center">Créer un Profil</h4>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST" action="{{ url_for('profiles.create_profile') }}" class="needs-validation" novalidate>
+                        <div class="row g-4">
+                            <!-- Informations Personnelles -->
+                            <div class="col-md-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title mb-4 text-primary">Informations Personnelles</h5>
+                                        <div class="mb-3">
+                                            <label for="first_name" class="form-label">Prénom</label>
+                                            <input type="text" class="form-control" id="first_name" name="first_name" 
+                                                value="{{ form_data.get('first_name', '') }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="last_name" class="form-label">Nom</label>
+                                            <input type="text" class="form-control" id="last_name" name="last_name" 
+                                                value="{{ form_data.get('last_name', '') }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="date_of_birth" class="form-label">Date de Naissance</label>
+                                            <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" 
+                                                value="{{ form_data.get('date_of_birth', '') }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="email" class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="email" name="email" 
+                                                value="{{ form_data.get('email', '') }}" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Informations Professionnelles -->
+                            <div class="col-md-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title mb-4 text-primary">Informations Professionnelles</h5>
+                                        <div class="mb-3">
+                                            <label for="professional_number" class="form-label">Numéro Professionnel</label>
+                                            <input type="text" class="form-control" id="professional_number" name="professional_number" 
+                                                value="{{ form_data.get('professional_number', '') }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="job_function" class="form-label">Fonction</label>
+                                            <input type="text" class="form-control" id="job_function" name="job_function" 
+                                                value="{{ form_data.get('job_function', '') }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="recruitment_date" class="form-label">Date de Recrutement</label>
+                                            <input type="date" class="form-control" id="recruitment_date" name="recruitment_date" 
+                                                value="{{ form_data.get('recruitment_date', '') }}" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg px-5">
+                                <i class="fas fa-save me-2"></i>Enregistrer le Profil
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+.form-control {
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+}
+.form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+.btn-primary {
+    border-radius: 0.5rem;
+    padding: 0.75rem 2rem;
+}
+</style>
+{% endblock %}

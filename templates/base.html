@@ -218,6 +218,22 @@
                             <span>Nouvel Incident</span>
                         </a>
                     </li>
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('profiles.view_profile') }}">
+                            <i class="fas fa-id-card"></i>
+                            <span>Mon Profil</span>
+                        </a>
+                    </li>
+                    {% if current_user.role == 'Admin' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('profiles.admin_profiles') }}">
+                            <i class="fas fa-users-cog"></i>
+                            <span>Gestion des Profils</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endif %}
                 </ul>
                 <div class="user-section">
                     <div class="d-flex align-items-center">

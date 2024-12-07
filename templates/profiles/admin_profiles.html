@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">User Profiles</h4>
+                    <div class="d-flex">
+                        <a href="{{ url_for('manage_units') }}" class="btn btn-light me-2">
+                            <i class="fas fa-building"></i> Gérer les Unités
+                        </a>
+                        <input type="text" id="searchInput" class="form-control me-2" placeholder="Search profiles...">
+                        <button class="btn btn-light" onclick="refreshTable()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="profilesTable">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortTable(0)">Name <i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(1)">Email <i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(2)">Professional Number <i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(3)">Job Function <i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(4)">Unit <i class="fas fa-sort"></i></th>
+                                    <th onclick="sortTable(5)">Recruitment Date <i class="fas fa-sort"></i></th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for profile in profiles %}
+                                <tr>
+                                    <td>{{ profile.first_name }} {{ profile.last_name }}</td>
+                                    <td>{{ profile.email }}</td>
+                                    <td>{{ profile.professional_number }}</td>
+                                    <td>{{ profile.job_function }}</td>
+                                    <td>{{ profile.user.unit.name if profile.user.unit else 'N/A' }}</td>
+                                    <td>{{ profile.recruitment_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info" onclick="viewProfile({{ profile.id }})">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let sortDirection = 1;
+let lastSortedColumn = -1;
+
+function sortTable(columnIndex) {
+    const table = document.getElementById('profilesTable');
+    const tbody = table.getElementsByTagName('tbody')[0];
+    const rows = Array.from(tbody.getElementsByTagName('tr'));
+
+    if (lastSortedColumn === columnIndex) {
+        sortDirection *= -1;
+    } else {
+        sortDirection = 1;
+        lastSortedColumn = columnIndex;
+    }
+
+    rows.sort((a, b) => {
+        const aValue = a.cells[columnIndex].textContent.trim();
+        const bValue = b.cells[columnIndex].textContent.trim();
+        return aValue.localeCompare(bValue) * sortDirection;
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+const searchProfiles = debounce(async () => {
+    const searchQuery = document.getElementById('searchInput').value;
+    try {
+        const response = await fetch(`/api/profiles/search?q=${encodeURIComponent(searchQuery)}`);
+        const profiles = await response.json();
+        updateTable(profiles);
+    } catch (error) {
+        console.error('Error searching profiles:', error);
+    }
+}, 300);
+
+document.getElementById('searchInput').addEventListener('input', searchProfiles);
+
+function updateTable(profiles) {
+    const tbody = document.querySelector('#profilesTable tbody');
+    tbody.innerHTML = profiles.map(profile => `
+        <tr>
+            <td>${profile.first_name} ${profile.last_name}</td>
+            <td>${profile.email}</td>
+            <td>${profile.professional_number}</td>
+            <td>${profile.job_function}</td>
+            <td>${profile.unit || 'N/A'}</td>
+            <td>${new Date(profile.recruitment_date).toLocaleDateString()}</td>
+            <td>
+                <button class="btn btn-sm btn-info" onclick="viewProfile(${profile.id})">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function viewProfile(profileId) {
+    window.location.href = `{{ url_for('profiles.view_user_profile', user_id=0) }}`.replace('0', profileId);
+}
+
+function refreshTable() {
+    window.location.reload();
+}
+</script>
+{% endblock %}

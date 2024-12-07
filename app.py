@@ -23,6 +23,7 @@ from reportlab.lib.fonts import addMapping
 from reportlab.lib.enums import TA_RIGHT, TA_CENTER
 from models import db, User, Unit, Incident
 from routes.auth import auth
+from routes.profiles import profiles
 
 # Load environment variables
 load_dotenv()
@@ -30,7 +31,7 @@ load_dotenv()
 # Initialize Flask app
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', os.urandom(24))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ona.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ona_incidents.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize extensions
@@ -44,6 +45,7 @@ login_manager.login_message_category = 'warning'
 
 # Register blueprints
 app.register_blueprint(auth)
+app.register_blueprint(profiles)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -382,7 +384,7 @@ def admin_required(f):
 @admin_required
 def manage_units():
     units = Unit.query.all()
-    return render_template('admin/units.html', units=units)
+    return render_template('admin/manage_units.html', units=units)
 
 @app.route('/admin/units/new', methods=['POST'])
 @login_required
@@ -406,11 +408,19 @@ def new_unit():
     flash('Unité créée avec succès.', 'success')
     return redirect(url_for('manage_units'))
 
-@app.route('/admin/units/<int:unit_id>/edit', methods=['POST'])
+@app.route('/admin/units/<int:unit_id>/edit', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def edit_unit(unit_id):
     unit = Unit.query.get_or_404(unit_id)
+    
+    if request.method == 'GET':
+        return jsonify({
+            'name': unit.name,
+            'location': unit.location or '',
+            'description': unit.description or ''
+        })
+
     name = request.form.get('name')
     location = request.form.get('location')
     description = request.form.get('description')
@@ -431,12 +441,18 @@ def edit_unit(unit_id):
     flash('Unité mise à jour avec succès.', 'success')
     return redirect(url_for('manage_units'))
 
-@app.route('/admin/units/<int:unit_id>/delete', methods=['POST'])
+@app.route('/admin/units/<int:unit_id>/delete', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def delete_unit(unit_id):
     unit = Unit.query.get_or_404(unit_id)
     
+    if request.method == 'GET':
+        if unit.users or unit.incidents:
+            flash('Impossible de supprimer cette unité car elle contient des utilisateurs ou des incidents.', 'danger')
+            return redirect(url_for('manage_units'))
+        return render_template('admin/confirm_delete_unit.html', unit=unit)
+
     if unit.users or unit.incidents:
         flash('Impossible de supprimer cette unité car elle contient des utilisateurs ou des incidents.', 'danger')
         return redirect(url_for('manage_units'))

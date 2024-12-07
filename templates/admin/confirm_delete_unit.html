@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Confirmer la suppression</h4>
+                </div>
+                <div class="card-body">
+                    <p>Êtes-vous sûr de vouloir supprimer l'unité <strong>{{ unit.name }}</strong> ?</p>
+                    <p>Cette action est irréversible.</p>
+                    
+                    <form method="POST">
+                        <div class="d-flex justify-content-end">
+                            <a href="{{ url_for('manage_units') }}" class="btn btn-secondary me-2">Annuler</a>
+                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

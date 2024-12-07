@@ -13,6 +13,33 @@ class Unit(db.Model):
     users = db.relationship('User', backref='unit', lazy=True)
     incidents = db.relationship('Incident', backref='unit', lazy=True)
 
+class UserProfile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False)
+    date_of_birth = db.Column(db.Date, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    professional_number = db.Column(db.String(50), unique=True, nullable=False)
+    job_function = db.Column(db.String(100), nullable=False)
+    recruitment_date = db.Column(db.DateTime, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def calculate_years_of_work(self):
+        today = datetime.now()
+        years = today.year - self.recruitment_date.year
+        if today.month < self.recruitment_date.month or (today.month == self.recruitment_date.month and today.day < self.recruitment_date.day):
+            years -= 1
+        return years
+
+    def calculate_age(self):
+        today = datetime.now()
+        years = today.year - self.date_of_birth.year
+        if today.month < self.date_of_birth.month or (today.month == self.date_of_birth.month and today.day < self.date_of_birth.day):
+            years -= 1
+        return years
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -21,6 +48,7 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(20), nullable=False, default='Unit Officer')
     unit_id = db.Column(db.Integer, db.ForeignKey('unit.id'))
     incidents = db.relationship('Incident', backref='author', lazy=True)
+    profile = db.relationship('UserProfile', backref='user', uselist=False, lazy=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
