@@ -1,0 +1,183 @@
+/* ONA Dashboard Styles */
+:root {
+    --ona-blue: #356ee7;
+    --ona-green: #95C11F;
+    --ona-light-blue: #173aaa;
+    --white: #ffffff;
+    --light-gray: #f8f9fa;
+    --dark: #2b2d42;
+    --text-gray: #6c757d;
+}
+
+@keyframes slideFromNavbar {
+    0% {
+        opacity: 0;
+        transform: translateY(-100px) scale(0.5);
+    }
+    30% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Dashboard Layout */
+.dashboard-wrapper {
+    min-height: calc(100vh - 56px);
+    background-color: var(--light-gray);
+}
+
+/* Header Section */
+.dashboard-header {
+    background: linear-gradient(135deg, var(--ona-blue), var(--ona-light-blue));
+    padding: 3rem 0;
+    color: var(--white);
+    margin-bottom: 2rem;
+}
+
+.header-content {
+    text-align: center;
+    position: relative;
+}
+
+/* Removed header-logo styles as they're now inline */
+
+.header-content h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.unit-name {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    height: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.card-header i {
+    font-size: 1.5rem;
+    color: var(--ona-blue);
+    background: rgba(0, 159, 227, 0.1);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Action Buttons */
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, var(--ona-blue), var(--ona-light-blue));
+    color: var(--white);
+    border-radius: 8px;
+    text-decoration: none;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.action-btn:last-child {
+    margin-bottom: 0;
+}
+
+.action-btn:hover {
+    background: linear-gradient(135deg, var(--ona-light-blue), var(--ona-blue));
+    color: var(--white);
+    transform: translateX(5px);
+}
+
+.action-btn i {
+    font-size: 1.2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-header {
+        padding: 2rem 0;
+    }
+
+    .header-content h1 {
+        font-size: 1.5rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .action-btn {
+        padding: 0.875rem 1rem;
+    }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes logoFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dashboard-card {
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.dashboard-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.dashboard-card:nth-child(3) {
+    animation-delay: 0.2s;
+}

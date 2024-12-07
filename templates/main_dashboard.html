@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+
+{% block title %}ONA - Page Principale{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes slideToCenter {
+        0% {
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+        100% {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes subtleSlideUp {
+        0% {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .dashboard-wrapper {
+        background-color: #f8f9fa;
+        min-height: calc(100vh - 56px);
+        padding-bottom: 2rem;
+    }
+    .dashboard-header {
+        background: linear-gradient(135deg, #356ee7 0%, #137fbd 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    .header-content {
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .header-title {
+        font-size: 2rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        animation: subtleSlideUp 0.8s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+        margin-bottom: 1rem;
+        opacity: 0;
+    }
+    .welcome-message {
+        font-size: 1.1rem;
+        opacity: 0;
+        margin-top: 0.5rem;
+        animation: subtleSlideUp 0.8s cubic-bezier(0.215, 0.61, 0.355, 1) 0.2s forwards;
+    }
+    .stats-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        height: 100%;
+        transition: transform 0.3s ease;
+    }
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+    .stats-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        position: relative;
+        z-index: 2;
+    }
+    .stats-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #2563eb;
+        position: relative;
+        z-index: 2;
+    }
+    .stats-label {
+        color: #4b5563;
+        font-size: 1rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        z-index: 2;
+    }
+    .stats-percentage {
+        font-size: 1rem;
+        color: #666;
+        margin-left: 0.5rem;
+    }
+    .stats-trend {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 0.5rem;
+    }
+    .text-primary {
+        color: #2563eb !important;
+    }
+    .text-success {
+        color: #059669 !important;
+    }
+    .text-warning {
+        color: #d97706 !important;
+    }
+    .action-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 1.5rem;
+    }
+    .action-btn {
+        display: block;
+        padding: 1rem;
+        margin: 0.5rem 0;
+        border-radius: 8px;
+        color: white;
+        text-decoration: none;
+        transition: transform 0.2s;
+    }
+    .action-btn:hover {
+        transform: translateX(5px);
+        color: white;
+    }
+    .action-btn.primary {
+        background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+    }
+    .action-btn.secondary {
+        background: linear-gradient(135deg, #26c6da 0%, #00acc1 100%);
+    }
+    .action-btn.warning {
+        background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+    }
+    .recent-incidents {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .incident-item {
+        padding: 1rem;
+        border-bottom: 1px solid #eee;
+        transition: background-color 0.2s;
+    }
+    .incident-item:last-child {
+        border-bottom: none;
+    }
+    .incident-item:hover {
+        background-color: #f8f9fa;
+    }
+    .incident-title {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    .incident-meta {
+        font-size: 0.85rem;
+        color: #666;
+    }
+    .status-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    .status-resolved {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+    }
+    .status-pending {
+        background-color: #fff3e0;
+        color: #ef6c00;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Header Section -->
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="header-content">
+                <img src="{{ url_for('static', filename='images/ona_logo.png') }}" alt="ONA Logo" 
+                     style="width: 120px; height: auto; margin-bottom: 1.5rem; filter: brightness(0) invert(1); 
+                            animation: subtleSlideUp 1.2s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+                            transform-origin: center top;">
+                <h1 class="header-title">Office National de l'Assainissement</h1>
+                <h2>ONA SparK Medy</h2>
+                <p class="unit-name">{{ current_user.unite }}</p>
+                <p class="welcome-message">
+                    Bienvenue , {{ current_user.username }} | {{ datetime.now().strftime('%d %B %Y') }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Statistics Row -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="stats-card text-center">
+                    <div class="stats-icon text-primary">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="stats-number">
+                        {{ total_incidents }}
+                        <small class="stats-percentage">100%</small>
+                    </div>
+                    <div class="stats-label">Total des Incidents</div>
+                    <div class="stats-trend">
+                        <small>Total à ce jour</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card text-center">
+                    <div class="stats-icon text-success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stats-number">
+                        {{ resolved_incidents }}
+                        <small class="stats-percentage">
+                            {% if total_incidents > 0 %}
+                                {{ "{:.1f}".format(resolved_incidents / total_incidents * 100) }}%
+                            {% else %}
+                                0%
+                            {% endif %}
+                        </small>
+                    </div>
+                    <div class="stats-label">Incidents Résolus</div>
+                    <div class="stats-trend">
+                        <small>Taux de résolution</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card text-center">
+                    <div class="stats-icon text-warning">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stats-number">
+                        {{ pending_incidents }}
+                        <small class="stats-percentage">
+                            {% if total_incidents > 0 %}
+                                {{ "{:.1f}".format(pending_incidents / total_incidents * 100) }}%
+                            {% else %}
+                                0%
+                            {% endif %}
+                        </small>
+                    </div>
+                    <div class="stats-label">Incidents en Cours</div>
+                    <div class="stats-trend">
+                        <small>En attente de résolution</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Quick Actions Column -->
+            <div class="col-md-4">
+                <div class="action-card">
+                    <h4 class="mb-3"><i class="fas fa-bolt me-2"></i>Actions Rapides</h4>
+                    <a href="{{ url_for('new_incident') }}" class="action-btn primary">
+                        <i class="fas fa-plus me-2"></i>Nouvel Incident
+                    </a>
+                    <a href="{{ url_for('incident_list') }}" class="action-btn secondary">
+                        <i class="fas fa-list me-2"></i>Liste des Incidents
+                    </a>
+                    {% if current_user.role == 'Admin' %}
+                    <a href="{{ url_for('manage_users') }}" class="action-btn warning">
+                        <i class="fas fa-users me-2"></i>Gestion des Utilisateurs
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Recent Incidents Column -->
+            <div class="col-md-8">
+                <div class="recent-incidents">
+                    <h4 class="mb-3"><i class="fas fa-history me-2"></i>Incidents Récents</h4>
+                    {% if recent_incidents %}
+                        {% for incident in recent_incidents %}
+                        <div class="incident-item">
+                            <div class="incident-title">
+                                {{ incident.titre }}
+                                <span class="status-badge {% if incident.status == 'Résolu' %}status-resolved{% else %}status-pending{% endif %} float-end">
+                                    {{ incident.status }}
+                                </span>
+                            </div>
+                            <div class="incident-meta">
+                                <i class="fas fa-calendar-alt me-1"></i>
+                                {{ incident.date_incident.strftime('%d/%m/%Y') }}
+                                <i class="fas fa-user ms-3 me-1"></i>
+                                {{ incident.author.username }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center py-3">Aucun incident récent</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

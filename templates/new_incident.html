@@ -1,0 +1,412 @@
+{% extends "base.html" %}
+
+{% block title %}Nouvel Incident{% endblock %}
+
+{% block extra_css %}
+<link href="{{ url_for('static', filename='css/base.css') }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/incident-form.css') }}" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<style>
+    /* Base styles */
+    .map-container {
+        height: 400px;
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 1rem 0;
+        border: 2px solid #E3F2FD;
+        position: relative;
+    }
+
+    #map {
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+
+    /* Enhanced Select Styling */
+    .severity-select-container {
+        position: relative;
+    }
+
+    .severity-select-container .form-select {
+        height: 48px;
+        padding: 0.75rem 2.75rem;
+        font-size: 0.95rem;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        background-color: #fff;
+        cursor: pointer;
+        -webkit-appearance: none;
+        appearance: none;
+        transition: all 0.2s ease;
+        color: #2c3e50;
+        font-weight: 500;
+    }
+
+    .severity-select-container .form-select:hover {
+        border-color: #90caf9;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .severity-select-container .form-select:focus {
+        border-color: #2196f3;
+        box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
+        outline: none;
+    }
+
+    /* Dot indicator */
+    .severity-select-container::before {
+        content: "🟢";
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.1rem;
+        z-index: 2;
+        transition: color 0.2s ease;
+    }
+
+    /* Dropdown arrow */
+    .severity-select-container::after {
+        content: "";
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 10px;
+        height: 10px;
+        border-right: 2px solid #757575;
+        border-bottom: 2px solid #757575;
+        transform: translateY(-70%) rotate(45deg);
+        transition: transform 0.2s ease;
+    }
+
+    .severity-select-container:hover::after {
+        border-color: #2196f3;
+    }
+
+    /* Severity colors */
+    .severity-select-container.faible::before {
+        color: #4CAF50;
+    }
+
+    .severity-select-container.moyenne::before {
+        color: #FFC107;
+    }
+
+    .severity-select-container.elevee::before {
+        color: #FF9800;
+    }
+
+    .severity-select-container.critique::before {
+        color: #F44336;
+    }
+
+    /* Dropdown options styling */
+    .severity-select-container select option {
+        padding: 12px;
+        font-weight: 500;
+    }
+
+    .severity-select-container select option:first-child {
+        color: #757575;
+    }
+
+    /* Selected state */
+    .severity-select-container.has-value .form-select {
+        background-color: #f8f9fa;
+    }
+
+    /* Hover effect for options */
+    .severity-select-container select option:hover,
+    .severity-select-container select option:focus {
+        background-color: #e3f2fd;
+        color: #1976d2;
+    }
+
+    /* Active/Selected option */
+    .severity-select-container select option:checked {
+        background-color: #2196f3;
+        color: white;
+    }
+
+    /* Progress steps - keeping only what's needed */
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+
+    .step {
+        position: relative;
+        z-index: 2;
+        background: white;
+        padding: 0 1rem;
+        text-align: center;
+    }
+
+    .step-number {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 0.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .step-label {
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 incident-form">
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-1">Signaler un Nouvel Incident</h4>
+                    <p class="mb-0 text-white-50">
+                        <i class="fas fa-info-circle me-2"></i>Veuillez remplir tous les champs obligatoires
+                    </p>
+                </div>
+                <a href="{{ url_for('incident_list') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('new_incident') }}" method="POST" id="newIncidentForm">
+                <div class="form-section">
+                    <h5 class="form-section-title">
+                        <i class="fas fa-info-circle me-2"></i>Informations de l'incident
+                    </h5>
+                    <div class="row g-3">
+                        {% if current_user.role == 'Admin' %}
+                        <div class="col-md-12 mb-3">
+                            <label for="unit_id" class="form-label">
+                                <i class="fas fa-building me-2"></i>Unité
+                            </label>
+                            <select class="form-select" id="unit_id" name="unit_id" required>
+                                <option value="">Sélectionner une unité</option>
+                                {% for unit in units %}
+                                <option value="{{ unit.id }}">{{ unit.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% endif %}
+                        <div class="col-md-4">
+                            <label for="wilaya" class="form-label">
+                                <i class="fas fa-map me-2"></i>Wilaya
+                            </label>
+                            <input type="text" class="form-control" id="wilaya" name="wilaya" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="commune" class="form-label">
+                                <i class="fas fa-map-signs me-2"></i>Commune
+                            </label>
+                            <input type="text" class="form-control" id="commune" name="commune" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="localite" class="form-label">
+                                <i class="fas fa-map-pin me-2"></i>Localité
+                            </label>
+                            <input type="text" class="form-control" id="localite" name="localite" required>
+                        </div>
+                        <div class="col-12">
+                            <button type="button" class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#mapModal">
+                                <i class="fas fa-map-marked-alt me-2"></i>Sélectionner sur la carte
+                            </button>
+                            <input type="hidden" id="latitude" name="latitude">
+                            <input type="hidden" id="longitude" name="longitude">
+                            <small class="text-muted mt-2 d-block">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Cliquez sur la carte pour sélectionner l'emplacement exact de l'incident
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section mt-4">
+                    <h5 class="form-section-title">
+                        <i class="fas fa-exclamation-circle me-2"></i>Détails de l'incident
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label for="nature_cause" class="form-label">
+                                <i class="fas fa-file-alt me-2"></i>Nature et cause
+                            </label>
+                            <textarea class="form-control" id="nature_cause" name="nature_cause" rows="3" required></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="date_incident" class="form-label">
+                                <i class="fas fa-calendar-alt me-2"></i>Date et heure
+                            </label>
+                            <input type="datetime-local" class="form-control" id="date_incident" name="date_incident" required>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-4">
+                                <label for="gravite" class="form-label d-flex align-items-center">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Niveau de gravité
+                                </label>
+                                <div class="severity-select-container">
+                                    <select class="form-select" id="gravite" name="gravite" required>
+                                        <option value="" disabled selected>Sélectionner le niveau de gravité</option>
+                                        <option value="faible">Faible</option>
+                                        <option value="moyenne">Moyenne</option>
+                                        <option value="elevee">Élevée</option>
+                                        <option value="critique">Critique</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section mt-4">
+                    <h5 class="form-section-title">
+                        <i class="fas fa-tools me-2"></i>Mesures et impact
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="mesures_prises" class="form-label">
+                                <i class="fas fa-clipboard-check me-2"></i>Mesures prises
+                            </label>
+                            <textarea class="form-control" id="mesures_prises" name="mesures_prises" rows="3" required></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="impact" class="form-label">
+                                <i class="fas fa-chart-line me-2"></i>Impact
+                            </label>
+                            <textarea class="form-control" id="impact" name="impact" rows="3" required></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <a href="{{ url_for('incident_list') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Enregistrer l'incident
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Map Modal -->
+    <div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mapModalLabel">
+                        <i class="fas fa-map-marker-alt me-2"></i>Sélectionner l'emplacement
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="incident-map" class="map-container"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script>
+    // Set current date and time
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    document.getElementById('date_incident').value = now.toISOString().slice(0,16);
+
+    // Severity dropdown handling
+    document.addEventListener('DOMContentLoaded', function() {
+        const severitySelect = document.getElementById('gravite');
+        const container = severitySelect.closest('.severity-select-container');
+
+        function updateSeverityClass() {
+            const value = severitySelect.value;
+            container.classList.remove('faible', 'moyenne', 'elevee', 'critique');
+            if (value) {
+                container.classList.add(value);
+                container.classList.add('has-value');
+            }
+        }
+
+        severitySelect.addEventListener('change', updateSeverityClass);
+        updateSeverityClass();
+
+        // Initialize map modal
+        const mapModal = document.getElementById('mapModal');
+        let map = null;
+        let marker = null;
+        const defaultLat = 36.7538;  // Default to Algeria's approximate center
+        const defaultLng = 3.0588;
+
+        mapModal.addEventListener('shown.bs.modal', function () {
+            if (!map) {
+                map = L.map('incident-map').setView([defaultLat, defaultLng], 6);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+
+                // Add click event to map
+                map.on('click', function(e) {
+                    const lat = e.latlng.lat;
+                    const lng = e.latlng.lng;
+                    
+                    if (marker) {
+                        map.removeLayer(marker);
+                    }
+                    
+                    marker = L.marker([lat, lng]).addTo(map);
+                    document.getElementById('latitude').value = lat;
+                    document.getElementById('longitude').value = lng;
+
+                    // Reverse geocoding using Nominatim
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.address) {
+                                if (data.address.state) {
+                                    document.getElementById('wilaya').value = data.address.state;
+                                }
+                                if (data.address.city || data.address.town || data.address.village) {
+                                    document.getElementById('commune').value = data.address.city || data.address.town || data.address.village;
+                                }
+                                if (data.address.suburb || data.address.neighbourhood) {
+                                    document.getElementById('localite').value = data.address.suburb || data.address.neighbourhood;
+                                }
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                });
+            }
+            
+            // Force map to redraw after modal is shown
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 10);
+        });
+    });
+
+    // Form validation and submission
+    const form = document.getElementById('newIncidentForm');
+    form.addEventListener('submit', function(e) {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Enregistrement...';
+    });
+</script>
+{% endblock %}

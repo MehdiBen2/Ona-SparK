@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion des Utilisateurs{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Gestion des Utilisateurs</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newUserModal">
+                <i class="fas fa-user-plus"></i> Nouvel Utilisateur
+            </button>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="input-group">
+                <input type="text" id="userSearch" class="form-control" placeholder="Rechercher un utilisateur...">
+                <span class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <select id="roleFilter" class="form-select">
+                <option value="">Tous les rôles</option>
+                <option value="Admin">Admin</option>
+                <option value="Regional Manager">Manager Régional</option>
+                <option value="Unit Officer">Officier d'Unité</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nom d'utilisateur</th>
+                            <th>Rôle</th>
+                            <th>Unité</th>
+                            <th>Incidents</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.role }}</td>
+                            <td>{{ user.unit.name if user.unit else '-' }}</td>
+                            <td>{{ user.incidents|length }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editUserModal{{ user.id }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                {% if user.id != current_user.id %}
+                                <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ user.id }}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New User Modal -->
+<div class="modal fade" id="newUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nouvel Utilisateur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('new_user') }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nom d'utilisateur *</label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Surnom (affiché dans la barre de navigation)</label>
+                        <input type="text" class="form-control" name="nickname" placeholder="Surnom optionnel">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mot de passe *</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rôle *</label>
+                        <select name="role" class="form-select" required>
+                            <option value="Admin">Admin</option>
+                            <option value="Regional Manager">Manager Régional</option>
+                            <option value="Unit Officer">Officier d'Unité</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 unit-field">
+                        <label class="form-label">Unité</label>
+                        <select name="unit_id" class="form-select">
+                            <option value="">Sélectionner une unité</option>
+                            {% for unit in units %}
+                            <option value="{{ unit.id }}">{{ unit.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">Requis pour les Officiers d'Unité</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Créer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modals -->
+{% for user in users %}
+<div class="modal fade" id="editUserModal{{ user.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modifier l'Utilisateur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('edit_user', user_id=user.id) }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nom d'utilisateur *</label>
+                        <input type="text" name="username" class="form-control" value="{{ user.username }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Surnom (affiché dans la barre de navigation)</label>
+                        <input type="text" class="form-control" name="nickname" value="{{ user.nickname }}" placeholder="Surnom optionnel">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nouveau mot de passe</label>
+                        <input type="password" name="password" class="form-control">
+                        <small class="text-muted">Laisser vide pour conserver le mot de passe actuel</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rôle *</label>
+                        <select name="role" class="form-select" required>
+                            <option value="Admin" {% if user.role == 'Admin' %}selected{% endif %}>Admin</option>
+                            <option value="Regional Manager" {% if user.role == 'Regional Manager' %}selected{% endif %}>Manager Régional</option>
+                            <option value="Unit Officer" {% if user.role == 'Unit Officer' %}selected{% endif %}>Officier d'Unité</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 unit-field">
+                        <label class="form-label">Unité</label>
+                        <select name="unit_id" class="form-select">
+                            <option value="">Sélectionner une unité</option>
+                            {% for unit in units %}
+                            <option value="{{ unit.id }}" {% if user.unit_id == unit.id %}selected{% endif %}>{{ unit.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">Requis pour les Officiers d'Unité</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Mettre à jour</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete User Modal -->
+<div class="modal fade" id="deleteUserModal{{ user.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la Suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer l'utilisateur "{{ user.username }}" ?</p>
+                {% if user.incidents %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Cet utilisateur ne peut pas être supprimé car il a {{ user.incidents|length }} incident(s) associé(s).
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-danger" {% if user.incidents %}disabled{% endif %}>
+                        Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% block extra_js %}
+<script>
+// Search functionality
+document.getElementById('userSearch').addEventListener('keyup', filterUsers);
+document.getElementById('roleFilter').addEventListener('change', filterUsers);
+
+function filterUsers() {
+    const searchText = document.getElementById('userSearch').value.toLowerCase();
+    const roleFilter = document.getElementById('roleFilter').value;
+    const rows = document.querySelectorAll('tbody tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const role = row.children[1].textContent;
+        const matchesSearch = text.includes(searchText);
+        const matchesRole = !roleFilter || role === roleFilter;
+        row.style.display = matchesSearch && matchesRole ? '' : 'none';
+    });
+}
+
+// Unit field visibility toggle based on role
+function toggleUnitField(selectElement) {
+    const unitField = selectElement.closest('.modal-body').querySelector('.unit-field');
+    const unitSelect = unitField.querySelector('select');
+    if (selectElement.value === 'Unit Officer') {
+        unitField.style.display = 'block';
+        unitSelect.required = true;
+    } else {
+        unitField.style.display = 'none';
+        unitSelect.required = false;
+        unitSelect.value = '';
+    }
+}
+
+// Add event listeners to all role selects
+document.querySelectorAll('select[name="role"]').forEach(select => {
+    select.addEventListener('change', (e) => toggleUnitField(e.target));
+    toggleUnitField(select); // Initial state
+});
+</script>
+{% endblock %}
+
+{% endblock %}

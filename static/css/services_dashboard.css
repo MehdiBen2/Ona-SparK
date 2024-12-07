@@ -1,0 +1,96 @@
+/* Services Dashboard Styles */
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #2b8a3e;
+    --text-color: #333;
+    --light-gray: #f8f9fa;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* General Styles */
+.service-section {
+    animation: fadeIn 0.6s ease-out;
+}
+
+/* Card Hover Effects */
+.service-card {
+    position: relative;
+    z-index: 1;
+}
+
+.service-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+    border-radius: 15px;
+}
+
+.service-card:hover::after {
+    opacity: 0.05;
+}
+
+.service-icon {
+    transition: transform 0.3s ease;
+}
+
+.service-card:hover .service-icon {
+    transform: scale(1.1);
+}
+
+/* Stats Card */
+.stats-card h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.stats-card p {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .service-header {
+        padding: 2rem 0;
+    }
+
+    .service-title {
+        font-size: 2rem;
+    }
+
+    .stats-card h3 {
+        font-size: 2rem;
+    }
+
+    .service-card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Accessibility */
+.service-card:focus-within {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+    .service-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}
