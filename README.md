@@ -1,39 +1,73 @@
-# Mobile ONA Web Application
+# Ona-SparK ✨
 
-A mobile-friendly web application for incident reporting and management.
+Bienvenue sur **Ona-SparK**, une application web puissante et intuitive, conçue pour simplifier la déclaration d’incidents, générer des rapports mensuels et offrir une plateforme sécurisée et responsive à votre organisation. Que vous soyez une petite équipe ou une grande entreprise, Ona-SparK vous aide à optimiser votre flux de travail directement depuis votre navigateur !
 
-## Setup Instructions
+## Fonctionnalités Clés 🌟
 
-1. Create a virtual environment:
+- **Interface Adaptée au Mobile** : Profitez d’une interface claire et esthétique, quel que soit l’appareil utilisé.
+- **Système de Déclaration d’Incidents** : Enregistrez rapidement et efficacement vos incidents, avec tous les détails nécessaires.
+- **Génération de Rapports Mensuels** : Créez des rapports mensuels structurés pour informer vos parties prenantes.
+- **Design Responsive** : Accédez à Ona-SparK depuis votre ordinateur, tablette ou téléphone, où que vous soyez.
+- **Authentification Sécurisée** : Protégez vos données et gérez l’accès de manière contrôlée.
+
+## Démarrage 🚀
+
+Suivez ces étapes pour installer et exécuter Ona-SparK en local :
+
+### 1. Cloner le Dépôt
 ```bash
+git clone https://github.com/votre-nom-utilisateur/ona-spark.git
+
+2. Créer & Activer un Environnement Virtuel
+
+Pour Windows :
+
 python -m venv venv
-```
-
-2. Activate the virtual environment:
-- Windows:
-```bash
 venv\Scripts\activate
-```
-- Unix/MacOS:
-```bash
+
+Pour Unix/MacOS :
+
+python3 -m venv venv
 source venv/bin/activate
-```
 
-3. Install dependencies:
-```bash
+3. Installer les Dépendances
+
+Avec l’environnement virtuel activé :
+
 pip install -r requirements.txt
-```
 
-4. Run the application:
-```bash
+4. Lancer l’Application
+
+Démarrez le serveur localement :
+
 python app.py
-```
 
-5. Open your web browser and navigate to `http://localhost:5000`
+5. Ouvrir dans votre Navigateur
 
-## Features
-- Mobile-friendly interface
-- Incident reporting system
-- Monthly report generation
-- Responsive design for all devices
-- Secure authentication
+Accédez à :
+
+http://localhost:5000
+
+Vous devriez voir l’interface d’Ona-SparK prête à l’emploi ! 🌐
+
+Comment ça Marche ? 🔧
+	•	Enregistrement d’Incidents : Saisissez facilement les informations clés (type, date, personnes concernées).
+	•	Génération de Rapports : Créez rapidement des rapports mensuels complets, parfaits pour les bilans, audits ou présentations.
+	•	Gestion des Utilisateurs : Ajoutez, supprimez ou modifiez les accès utilisateurs de façon sécurisée.
+	•	Personnalisation : Adaptez Ona-SparK à vos processus. Configurez les types d’incidents, les champs et les paramètres de rapport.
+
+Contribuer 🤝
+
+Nous apprécions toutes les contributions ! Pour participer :
+	1.	Forkez ce dépôt.
+	2.	Créez une Nouvelle Branche pour votre fonctionnalité ou votre correction de bug.
+	3.	Soumettez une Pull Request décrivant vos modifications.
+
+Vos contributions aideront à améliorer Ona-SparK pour tout le monde !
+
+Licence 📜
+
+Ce projet est distribué sous la Licence MIT. N’hésitez pas à l’utiliser, le modifier et le distribuer comme bon vous semble.
+
+
+
