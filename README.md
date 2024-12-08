@@ -1,7 +1,6 @@
 # Ona-SparK ✨
 
-Bienvenue sur **Ona-SparK**, une application web puissante et intuitive, conçue pour simplifier la déclaration d’incidents, générer des rapports mensuels et offrir une plateforme sécurisée et responsive à votre organisation. Que vous soyez une petite équipe ou une grande entreprise, Ona-SparK vous aide à optimiser votre flux de travail directement depuis votre navigateur !
-
+national sanitary office
 ## Fonctionnalités Clés 🌟
 
 - **Interface Adaptée au Mobile** : Profitez d’une interface claire et esthétique, quel que soit l’appareil utilisé.
