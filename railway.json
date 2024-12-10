@@ -5,7 +5,7 @@
         "buildCommand": "pip install -r requirements.txt"
     },
     "deploy": {
-        "startCommand": "python -m flask db upgrade && gunicorn wsgi:app",
+        "startCommand": "python init_db.py && gunicorn wsgi:app",
         "restartPolicyType": "ON_FAILURE",
         "restartPolicyMaxRetries": 10,
         "healthcheckPath": "/"
