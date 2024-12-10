@@ -31,17 +31,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # Database configuration
-if os.getenv('RAILWAY_ENVIRONMENT'):
-    # Railway PostgreSQL database
-    database_url = os.getenv('DATABASE_URL')
-    if database_url:
-        # Replace postgres:// with postgresql:// for SQLAlchemy
-        database_url = database_url.replace('postgres://', 'postgresql://')
-        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-else:
-    # Local SQLite database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ona_incidents.db'
-
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ona_incidents.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'default-secret-key')
 
