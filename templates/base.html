@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - ONA SPARK</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --ona-primary: #356ee7;     /* Modern bright blue */
+            --ona-secondary: #173aaa;    /* Deep blue */
+            --ona-accent: #95C11F;       /* ONA Green */
+            --ona-dark: #2b2d42;
+            --ona-light: #f8f9fa;
+            --transition: all 0.3s ease-in-out;
+        }
+
+        /* Modern Navbar Styles */
+        .navbar {
+            background: linear-gradient(135deg, var(--ona-primary) 0%, var(--ona-secondary) 100%);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            padding: 0;
+            margin-right: 2rem;
+        }
+
+        .navbar-brand img {
+            height: 40px;
+            width: auto;
+            transition: var(--transition);
+            filter: brightness(0) invert(1);
+        }
+
+        .navbar-brand:hover img {
+            transform: scale(1.05);
+        }
+
+        .navbar-toggler {
+            padding: 0.4rem 0.6rem;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+        }
+
+        .navbar-toggler:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            padding: 0.5rem 1rem !important;
+            border-radius: 50px;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .nav-link.active {
+            color: white !important;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 0.5rem;
+            background: white;
+        }
+
+        .dropdown-item {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: var(--transition);
+            color: var(--ona-dark);
+        }
+
+        .dropdown-item:hover {
+            background: var(--ona-light);
+            color: var(--ona-primary);
+        }
+
+        .dropdown-item.active {
+            background: var(--ona-primary);
+            color: white;
+        }
+
+        .user-info {
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            margin-right: 1rem;
+        }
+
+        .user-info i {
+            font-size: 1.1rem;
+        }
+
+        .logout-btn {
+            color: rgba(255, 255, 255, 0.9);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .logout-btn:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+
+        /* Language Switcher */
+        .language-switcher {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: 1rem;
+        }
+
+        .lang-btn {
+            padding: 0.4rem 0.8rem;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: transparent;
+            color: white;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .lang-btn:hover,
+        .lang-btn.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        @media (max-width: 991.98px) {
+            .navbar-collapse {
+                background: linear-gradient(135deg, var(--ona-primary) 0%, var(--ona-secondary) 100%);
+                padding: 1rem;
+                border-radius: 12px;
+                margin-top: 1rem;
+            }
+
+            .user-info,
+            .logout-btn {
+                margin: 0.5rem 0;
+            }
+
+            .language-switcher {
+                margin: 0.5rem 0;
+                justify-content: center;
+            }
+        }
+    </style>
+    <style>
+        /* Notification Styles */
+        .notification-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            max-width: 400px;
+        }
+
+        .notification {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transform: translateX(-100%);
+            opacity: 0;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification-icon {
+            font-size: 1.2em;
+        }
+
+        .notification-message {
+            font-size: 0.9em;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            padding: 0 5px;
+            color: #666;
+        }
+
+        .notification.success {
+            border-left: 4px solid #28a745;
+        }
+
+        .notification.error {
+            border-left: 4px solid #dc3545;
+        }
+
+        .notification.warning {
+            border-left: 4px solid #ffc107;
+        }
+
+        .notification.info {
+            border-left: 4px solid #17a2b8;
+        }
+
+        .notification.success .notification-icon {
+            color: #28a745;
+        }
+
+        .notification.error .notification-icon {
+            color: #dc3545;
+        }
+
+        .notification.warning .notification-icon {
+            color: #ffc107;
+        }
+
+        .notification.info .notification-icon {
+            color: #17a2b8;
+        }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        .map-container {
+            height: 400px;
+            margin-bottom: 20px;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+                <img src="{{ url_for('static', filename='images/ona_logo.png') }}" alt="ONA">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars text-white"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Tableau de bord</span>
+                        </a>
+                    </li>
+                    {% if current_user.role in ['Admin', 'Employeur DG'] %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('departement') }}">
+                            <i class="fas fa-building"></i>
+                            <span>Départements</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('profiles.view_profile') }}">
+                            <i class="fas fa-id-card"></i>
+                            <span>Mon Profil</span>
+                        </a>
+                    </li>
+                    {% if current_user.role == 'Admin' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('profiles.admin_profiles') }}">
+                            <i class="fas fa-users-cog"></i>
+                            <span>Gestion des Profils</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endif %}
+                </ul>
+                <div class="user-section">
+                    <div class="d-flex align-items-center">
+                        {% if current_user.is_authenticated %}
+                            <div class="user-info">
+                                <i class="fas fa-user me-2"></i>
+                                <span>
+                                    {% if current_user.nickname %}
+                                        {{ current_user.nickname }}
+                                    {% else %}
+                                        {{ current_user.username }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            {% if current_user.assigned_unit %}
+                            <div class="user-info">
+                                <i class="fas fa-building me-2"></i>
+                                <span>{{ current_user.assigned_unit.name }}</span>
+                            </div>
+                            {% endif %}
+                            <a href="{{ url_for('auth.logout') }}" class="logout-btn text-white text-decoration-none ms-2" title="Déconnexion">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('auth.login') }}" class="btn btn-light">Connexion</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="notification-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="notification {{ category }}" role="alert">
+                        <div class="notification-content">
+                            <i class="fas fa-info-circle notification-icon"></i>
+                            <span class="notification-message">{{ message }}</span>
+                        </div>
+                        <button type="button" class="notification-close" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Notification handling
+            const notifications = document.querySelectorAll('.notification');
+            notifications.forEach(notification => {
+                // Show notification with slide animation
+                notification.style.transform = 'translateX(0)';
+                notification.style.opacity = '1';
+
+                // Auto-dismiss after 5 seconds
+                setTimeout(() => {
+                    dismissNotification(notification);
+                }, 5000);
+
+                // Close button handling
+                const closeBtn = notification.querySelector('.notification-close');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        dismissNotification(notification);
+                    });
+                }
+            });
+
+            function dismissNotification(notification) {
+                notification.style.transform = 'translateX(100%)';
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }
+        });
+    </script>
+
+    {% block content %}{% endblock %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toasts = document.querySelectorAll('.toast');
+        toasts.forEach((toast, index) => {
+            // Add initial transform for animation
+            toast.style.transform = 'translateX(100%)';
+            
+            // Force reflow
+            toast.offsetHeight;
+            
+            // Add delay based on index for staggered animation
+            setTimeout(() => {
+                // Start entrance animation
+                toast.style.transform = 'translateX(0)';
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    toast.style.transform = 'translateX(100%)';
+                    toast.style.opacity = '0';
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 300);
+                }, 5000);
+            }, index * 100); // Stagger each toast by 100ms
+        });
+    });
+    </script>
+    <script>
+        // Notification auto-dismiss and animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            
+            alerts.forEach(alert => {
+                // Auto dismiss after 5 seconds
+                setTimeout(() => {
+                    alert.classList.add('fade-out');
+                    setTimeout(() => {
+                        alert.remove();
+                    }, 500);
+                }, 5000);
+
+                // Handle manual close button
+                const closeBtn = alert.querySelector('.btn-close');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        alert.classList.add('fade-out');
+                        setTimeout(() => {
+                            alert.remove();
+                        }, 500);
+                    });
+                }
+            });
+        });
+    </script>
+    <script>
+        // Language persistence
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get saved language preference
+            const savedLang = localStorage.getItem('ona_language') || 'fr';
+            const langText = document.querySelector('.lang-text');
+            const html = document.documentElement;
+
+            // Apply saved language
+            if (savedLang === 'ar') {
+                langText.textContent = 'عربية';
+                html.setAttribute('lang', 'ar');
+                html.setAttribute('dir', 'rtl');
+                translateToArabic();
+            }
+        });
+
+        function toggleLanguage() {
+            const langText = document.querySelector('.lang-text');
+            const html = document.documentElement;
+            if (langText.textContent === 'FR') {
+                langText.textContent = 'عربية';
+                html.setAttribute('lang', 'ar');
+                html.setAttribute('dir', 'rtl');
+                localStorage.setItem('ona_language', 'ar');
+                translateToArabic();
+            } else {
+                langText.textContent = 'FR';
+                html.setAttribute('lang', 'fr');
+                html.setAttribute('dir', 'ltr');
+                localStorage.setItem('ona_language', 'fr');
+                translateToFrench();
+            }
+        }
+
+        function translateToArabic() {
+            // Add translations for navbar items
+            const translations = {
+                'Page Principale': 'الصفحة الرئيسية',
+                'Afficher les listes': 'عرض القوائم',
+                'Services': 'الخدمات',
+                'Nouveau': 'جديد',
+                'Incident': 'حادث',
+                'Déconnexion': 'تسجيل خروج'
+            };
+            
+            // Translate navigation items
+            document.querySelectorAll('.nav-link, .dropdown-item').forEach(el => {
+                const iconHtml = el.querySelector('i')?.outerHTML || '';
+                const text = el.textContent.trim();
+                if (translations[text]) {
+                    el.innerHTML = `${iconHtml}${translations[text]}`;
+                }
+            });
+
+            // Dispatch language change event
+            document.dispatchEvent(new CustomEvent('languageChanged', { detail: 'ar' }));
+        }
+
+        function translateToFrench() {
+            // Add translations for navbar items
+            const translations = {
+                'الصفحة الرئيسية': 'Page Principale',
+                'عرض القوائم': 'Afficher les listes',
+                'الخدمات': 'Services',
+                'جديد': 'Nouveau',
+                'حادث': 'Incident',
+                'تسجيل خروج': 'Déconnexion'
+            };
+            
+            // Translate navigation items
+            document.querySelectorAll('.nav-link, .dropdown-item').forEach(el => {
+                const iconHtml = el.querySelector('i')?.outerHTML || '';
+                const text = el.textContent.trim();
+                if (translations[text]) {
+                    el.innerHTML = `${iconHtml}${translations[text]}`;
+                }
+            });
+
+            // Dispatch language change event
+            document.dispatchEvent(new CustomEvent('languageChanged', { detail: 'fr' }));
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

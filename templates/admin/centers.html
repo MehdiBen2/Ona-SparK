@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}ONA - Liste des Centres{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- En-tête -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-building me-2 text-primary"></i>
+                    <span class="gradient-text">Liste des Centres</span>
+                </h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ url_for('main_dashboard') }}">Tableau de Bord</a></li>
+                        <li class="breadcrumb-item active">Centres</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des Centres -->
+    <div class="row">
+        <div class="col-12">
+            <div class="glass-card">
+                <div class="card-body">
+                    {% if current_user.role == 'Admin' or current_user.role == 'Unit Officer' %}
+                    <div class="mb-4">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newCenterModal">
+                            <i class="fas fa-plus-circle me-2"></i>Nouveau Centre
+                        </button>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Nom</th>
+                                    <th>Unité</th>
+                                    <th>Zone</th>
+                                    <th>Description</th>
+                                    <th>Contact</th>
+                                    {% if current_user.role in ['Admin', 'Unit Officer'] %}
+                                    <th>Actions</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for center in centers %}
+                                <tr>
+                                    <td><span class="badge bg-primary">{{ center.code }}</span></td>
+                                    <td>{{ center.name }}</td>
+                                    <td>{{ center.unit.name }}</td>
+                                    <td>{{ center.unit.zone.name }}</td>
+                                    <td>{{ center.description }}</td>
+                                    <td>
+                                        {% if center.email %}
+                                        <i class="fas fa-envelope me-2"></i>{{ center.email }}<br>
+                                        {% endif %}
+                                        {% if center.phone %}
+                                        <i class="fas fa-phone me-2"></i>{{ center.phone }}
+                                        {% endif %}
+                                    </td>
+                                    {% if current_user.role in ['Admin', 'Unit Officer'] %}
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-2" title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for new center -->
+{% if current_user.role in ['Admin', 'Unit Officer'] %}
+<div class="modal fade" id="newCenterModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nouveau Centre</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newCenterForm" method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    {% if current_user.role == 'Admin' %}
+                    <div class="mb-3">
+                        <label for="zone" class="form-label">Zone</label>
+                        <select class="form-select zone-select" id="zone" name="zone_id" required>
+                            <option value="">Sélectionner une zone</option>
+                            {% for zone in zones %}
+                            <option value="{{ zone.id }}">{{ zone.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="unit" class="form-label">Unité</label>
+                        <select class="form-select unit-select" id="unit" name="unit_id" required>
+                            <option value="">Sélectionner d'abord une zone</option>
+                        </select>
+                    </div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Téléphone</label>
+                        <input type="tel" class="form-control" id="phone" name="phone">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="submit" form="newCenterForm" class="btn btn-primary">Créer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+.glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 1rem;
+    padding: 1.5rem;
+}
+
+.gradient-text {
+    background: linear-gradient(45deg, #1976D2, #2196F3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.table th {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.badge {
+    font-weight: 500;
+    padding: 0.5em 1em;
+}
+</style>
+
+<script>
+function updateUnits(zoneSelect) {
+    const unitSelect = document.querySelector('.unit-select');
+    const zoneId = zoneSelect.value;
+    
+    // Reset unit select
+    unitSelect.innerHTML = '<option value="">Sélectionner une unité</option>';
+    
+    if (!zoneId) {
+        unitSelect.innerHTML = '<option value="">Sélectionner d\'abord une zone</option>';
+        return;
+    }
+
+    // Show loading state
+    unitSelect.innerHTML = '<option value="">Chargement des unités...</option>';
+
+    fetch(`/get_units_by_zone/${zoneId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
+            unitSelect.innerHTML = '<option value="">Sélectionner une unité</option>';
+            data.forEach(unit => {
+                unitSelect.innerHTML += `<option value="${unit.id}">${unit.name}</option>`;
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching units:', error);
+            unitSelect.innerHTML = '<option value="">Erreur: Impossible de charger les unités</option>';
+        });
+}
+
+// Add event listener when document is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    const zoneSelect = document.querySelector('.zone-select');
+    if (zoneSelect) {
+        zoneSelect.addEventListener('change', function() {
+            updateUnits(this);
+        });
+    }
+});
+</script>
+{% endblock %}

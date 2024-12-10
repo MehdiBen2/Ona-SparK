@@ -1,0 +1,78 @@
+/* Incident Form Specific Styles */
+.incident-form {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.incident-form .card-header {
+    background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+    color: var(--white);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+    padding: 1.5rem;
+}
+
+.incident-form .card-body {
+    padding: 2rem;
+}
+
+.incident-form textarea.form-control {
+    min-height: 120px;
+}
+
+.incident-form .severity-select {
+    position: relative;
+}
+
+.incident-form .severity-option {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.incident-form .severity-badge {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.location-info {
+    background: var(--bg-light);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.location-info .info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.location-info .info-label {
+    color: var(--text-muted);
+    min-width: 100px;
+}
+
+.location-info .info-value {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.form-section {
+    margin-bottom: 2rem;
+}
+
+.form-section-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--primary-dark);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border-light);
+}

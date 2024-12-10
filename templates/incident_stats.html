@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Statistiques des Incidents</h2>
+        <a href="{{ url_for('rapports') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour aux Rapports
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Total Incidents Card -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="display-4 text-primary mb-3">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <h3 class="display-4 mb-3">{{ total_incidents }}</h3>
+                    <h5 class="card-title">Total des Incidents</h5>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resolved Incidents Card -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="display-4 text-success mb-3">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3 class="display-4 mb-3">{{ resolved_incidents }}</h3>
+                    <h5 class="card-title">Incidents Résolus</h5>
+                    <p class="text-success">
+                        {{ "{:.1f}%".format((resolved_incidents / total_incidents * 100) if total_incidents > 0 else 0) }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Incidents Card -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="display-4 text-warning mb-3">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 class="display-4 mb-3">{{ pending_incidents }}</h3>
+                    <h5 class="card-title">Incidents en Cours</h5>
+                    <p class="text-warning">
+                        {{ "{:.1f}%".format((pending_incidents / total_incidents * 100) if total_incidents > 0 else 0) }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <canvas id="incidentChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var ctx = document.getElementById('incidentChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Résolus', 'En Cours'],
+            datasets: [{
+                data: [{{ resolved_incidents }}, {{ pending_incidents }}],
+                backgroundColor: [
+                    'rgba(40, 167, 69, 0.8)',
+                    'rgba(255, 193, 7, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(40, 167, 69, 1)',
+                    'rgba(255, 193, 7, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                title: {
+                    display: true,
+                    text: 'Distribution des Incidents'
+                }
+            }
+        }
+    });
+});
+</script>
+
+<style>
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.display-4 {
+    font-size: 2.5rem;
+}
+</style>
+{% endblock %}

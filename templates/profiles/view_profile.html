@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profile-container">
+    {% if not profile %}
+        <div class="container py-5">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-body">
+                    <div class="empty-profile-icon mb-4">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <h4 class="text-muted mb-4">Vous n'avez pas encore créé votre profil</h4>
+                    <a href="{{ url_for('profiles.create_profile') }}" class="btn btn-primary btn-lg px-5">
+                        <i class="fas fa-user-plus me-2"></i>Créer mon Profil
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="container position-relative">
+                <div class="ona-logo-container">
+                    <img src="{{ url_for('static', filename='images/ona-logo.png') }}" alt="ONA Logo" class="ona-logo">
+                </div>
+                <div class="text-center">
+                    <div class="profile-picture">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <h2 class="profile-name">{{ profile.first_name }} {{ profile.last_name }}</h2>
+                    <p class="profile-function">{{ profile.job_function }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="container py-5">
+            <div class="row g-4">
+                <!-- Personal Information Card -->
+                <div class="col-lg-6">
+                    <div class="profile-card">
+                        <div class="card-header">
+                            <i class="fas fa-user me-2"></i>
+                            <h5>Informations Personnelles</h5>
+                        </div>
+                        <div class="card-content">
+                            <div class="info-group">
+                                <label>Prénom</label>
+                                <p>{{ profile.first_name }}</p>
+                            </div>
+                            <div class="info-group">
+                                <label>Nom</label>
+                                <p>{{ profile.last_name }}</p>
+                            </div>
+                            <div class="info-group">
+                                <label>Date de Naissance</label>
+                                <p>{{ profile.date_of_birth.strftime('%d/%m/%Y') }} 
+                                   <span class="badge bg-info">{{ profile.calculate_age() }} ans</span>
+                                </p>
+                            </div>
+                            <div class="info-group">
+                                <label>Email</label>
+                                <p>{{ profile.email }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Professional Information Card -->
+                <div class="col-lg-6">
+                    <div class="profile-card">
+                        <div class="card-header">
+                            <i class="fas fa-briefcase me-2"></i>
+                            <h5>Informations Professionnelles</h5>
+                        </div>
+                        <div class="card-content">
+                            <div class="info-group">
+                                <label>Numéro Professionnel</label>
+                                <p>{{ profile.professional_number }}</p>
+                            </div>
+                            <div class="info-group">
+                                <label>Fonction</label>
+                                <p>{{ profile.job_function }}</p>
+                            </div>
+                            <div class="info-group">
+                                <label>Date de Recrutement</label>
+                                <p>{{ profile.recruitment_date.strftime('%d/%m/%Y') }}</p>
+                            </div>
+                            <div class="info-group">
+                                <label>Années d'Expérience</label>
+                                <p>
+                                    <span class="badge bg-success">{{ profile.calculate_years_of_work() }} ans</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            {% if not is_admin_view %}
+            <div class="text-center mt-5">
+                <a href="{{ url_for('profiles.edit_profile') }}" class="edit-profile-btn">
+                    <i class="fas fa-edit me-2"></i>Modifier le Profil
+                </a>
+            </div>
+            {% endif %}
+    {% endif %}
+</div>
+
+<style>
+/* General Styles */
+.profile-container {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* Profile Header */
+.profile-header {
+    background: linear-gradient(135deg, #0056b3 0%, #007bff 100%);
+    color: white;
+    padding: 1.5rem 0;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.ona-logo-container {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    z-index: 2;
+}
+
+.ona-logo {
+    max-width: 350px;
+    height: auto;
+}
+
+.profile-picture {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 1.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+}
+
+.profile-picture i {
+    font-size: 4rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.profile-name {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.profile-function {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+/* Profile Cards */
+.profile-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+    height: 100%;
+}
+
+.profile-card:hover {
+    transform: translateY(-5px);
+}
+
+.profile-card .card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+}
+
+.profile-card .card-header i {
+    font-size: 1.2rem;
+    color: #0d6efd;
+}
+
+.profile-card .card-header h5 {
+    margin: 0;
+    font-weight: 600;
+    color: #333;
+}
+
+.profile-card .card-content {
+    padding: 1.5rem;
+}
+
+.info-group {
+    margin-bottom: 1.5rem;
+}
+
+.info-group:last-child {
+    margin-bottom: 0;
+}
+
+.info-group label {
+    display: block;
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+}
+
+.info-group p {
+    color: #333;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* Empty Profile */
+.empty-profile-icon {
+    font-size: 5rem;
+    color: #dee2e6;
+}
+
+/* Edit Button */
+.edit-profile-btn {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    color: white;
+    background: #0d6efd;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.2);
+}
+
+.edit-profile-btn:hover {
+    background: #0b5ed7;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(13, 110, 253, 0.3);
+    color: white;
+}
+
+/* Badges */
+.badge {
+    padding: 0.5em 1em;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .profile-header {
+        padding: 2rem 0;
+    }
+    
+    .profile-name {
+        font-size: 2rem;
+    }
+    
+    .profile-picture {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .profile-card {
+        margin-bottom: 1rem;
+    }
+}
+</style>
+{% endblock %}

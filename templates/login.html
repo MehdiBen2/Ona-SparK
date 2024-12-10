@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ONA - Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .login-body {
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("{{ url_for('static', filename='images/bglogin.png') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .login-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .left-side {
+            background: rgba(30, 60, 114, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .right-side {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 3rem;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(30, 60, 114, 0.2);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 1);
+            border-color: #1e3c72;
+            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(30, 60, 114, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2a5298, #1e3c72);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(30, 60, 114, 0.3);
+        }
+
+        .btn-return {
+            background: transparent;
+            border: 2px solid rgba(30, 60, 114, 0.5);
+            color: #1e3c72;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-return:hover {
+            background: rgba(30, 60, 114, 0.1);
+            border-color: #1e3c72;
+            color: #1e3c72;
+            transform: translateY(-2px);
+        }
+
+        .logo-img {
+            max-width: 300px;
+            margin: -1rem 0;
+            filter: brightness(1.1);
+        }
+
+        .water-phrase {
+            margin-top: 2rem;
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+
+        .water-phrase span {
+            display: block;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .form-check-input:checked {
+            background-color: #1e3c72;
+            border-color: #1e3c72;
+        }
+
+        .alert {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .spark-heading {
+            color: white;
+            font-weight: bold;
+            margin-top: -1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .left-side h1, .left-side p {
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-title {
+            color: #1e3c72;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .error-message {
+            color: #ff4444;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .error-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .form-control.error {
+            border-color: #ff4444;
+            box-shadow: 0 0 0 0.2rem rgba(255, 68, 68, 0.25);
+        }
+
+        /* Login Animation Styles */
+        .login-animation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .login-animation-overlay::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            opacity: 0;
+            transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .login-animation-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .login-animation-overlay.expand::before {
+            opacity: 1;
+        }
+
+        .login-animation-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .login-animation-logo {
+            width: 180px;
+            transform: scale(0.2) rotate(-15deg);
+            opacity: 0;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .login-animation-overlay.active .login-animation-logo {
+            transform: scale(1) rotate(0);
+            opacity: 1;
+        }
+
+        .login-animation-overlay.expand .login-animation-logo {
+            transform: scale(20);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: drop-shadow(0 0 30px rgba(46, 91, 173, 0.4));
+        }
+
+        .login-animation-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            animation: pulseCircle 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        @keyframes pulseCircle {
+            0% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.2;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+        }
+
+        .loading-dots {
+            position: absolute;
+            bottom: -40px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            animation: loadingDots 1.4s infinite;
+        }
+
+        .loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes loadingDots {
+            0%, 100% {
+                opacity: 0.2;
+                transform: scale(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+        .work-duration {
+            position: absolute;
+            left: 50px;
+            top: 50%;
+            transform: translateY(-50%) translateX(-20px);
+            color: white;
+            font-size: 1.8rem;
+            opacity: 0;
+            transition: all 0.5s ease;
+            text-align: left;
+            z-index: 2;
+            width: 100%;
+            max-width: 600px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .work-duration.active {
+            opacity: 1;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        .work-duration p {
+            margin: 15px 0;
+            line-height: 1.4;
+        }
+
+        .work-duration .highlight {
+            color: #4dabf7;
+            font-weight: 600;
+            font-size: 2.2rem;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .work-duration .time-numbers {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin: 20px 0;
+            color: #4dabf7;
+            text-shadow: 0 0 15px rgba(77, 171, 247, 0.5);
+        }
+    </style>
+</head>
+<body class="login-body">
+    <div class="login-animation-overlay">
+        <div class="work-duration">
+            <p><span class="highlight">Mehdi Benhenni</span></p>
+            <p>a consacré avec passion</p>
+            <p class="time-numbers">54 jours</p>
+            <p>de développement accumulés à ce projet</p>
+        </div>
+        <div class="login-animation-container">
+            <div class="login-animation-circle"></div>
+            <img src="{{ url_for('static', filename='images/ona-logo.png') }}" alt="ONA Logo" class="login-animation-logo">
+            <div class="loading-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+    <div class="container login-container">
+        <div class="row justify-content-center min-vh-100 align-items-center">
+            <div class="col-12">
+                <div class="login-card">
+                    <div class="row g-0">
+                        <div class="col-md-6 left-side">
+                            <h1>Office National de l'Assainissement</h1>
+                            <h2 class="spark-heading">SparK</h2>
+                            <img src="{{ url_for('static', filename='images/ona-logo.png') }}" alt="ONA Logo" class="logo-img">
+                            <p>Système de Gestion Centralisée des Données</p>
+                            <script>
+                                // Logo Click Counter
+                                let logoClicks = 0;
+                                let lastClickTime = 0;
+                                const CLICK_TIMEOUT = 2000; // 2 seconds to reset counter
+
+                                document.querySelector('.logo-img').addEventListener('click', function(e) {
+                                    const currentTime = new Date().getTime();
+                                    
+                                    if (currentTime - lastClickTime > CLICK_TIMEOUT) {
+                                        logoClicks = 1;
+                                    } else {
+                                        logoClicks++;
+                                    }
+                                    
+                                    lastClickTime = currentTime;
+
+                                    // Check for easter egg activation
+                                    if (logoClicks === 4) {
+                                        logoClicks = 0;
+                                        
+                                        // Show animation overlay
+                                        const overlay = document.querySelector('.login-animation-overlay');
+                                        const workDuration = document.querySelector('.work-duration');
+                                        
+                                        // Update duration number with animation
+                                        const durationElement = document.querySelector('.time-numbers');
+                                        let currentNumber = 0;
+                                        const targetNumber = 54;
+                                        const animationDuration = 1500; // 1.5 seconds
+                                        const interval = 30; // Update every 30ms
+                                        const steps = animationDuration / interval;
+                                        const increment = targetNumber / steps;
+                                        
+                                        function animateNumber() {
+                                            currentNumber = Math.min(currentNumber + increment, targetNumber);
+                                            durationElement.textContent = Math.round(currentNumber) + ' jours';
+                                            
+                                            if (currentNumber < targetNumber) {
+                                                setTimeout(animateNumber, interval);
+                                            }
+                                        }
+                                        
+                                        overlay.classList.add('active');
+                                        workDuration.classList.add('active');
+                                        animateNumber();
+                                        
+                                        // Hide overlay after showing duration
+                                        setTimeout(() => {
+                                            workDuration.classList.remove('active');
+                                            setTimeout(() => {
+                                                overlay.classList.add('expand');
+                                                setTimeout(() => {
+                                                    overlay.classList.remove('active', 'expand');
+                                                }, 800);
+                                            }, 500);
+                                        }, 4000);
+                                    }
+                                });
+                            </script>
+                        </div>
+                        <div class="col-md-6 right-side">
+                            <div class="p-4">
+                                <h2 class="form-title">Connexion à l'Office</h2>
+                                {% with messages = get_flashed_messages() %}
+                                    {% if messages %}
+                                        {% for message in messages %}
+                                            <div class="alert alert-danger">{{ message }}</div>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endwith %}
+                                <form id="loginForm" method="POST">
+                                    <div class="mb-3">
+                                        <label for="username" class="form-label">Nom d'utilisateur</label>
+                                        <input type="text" class="form-control" id="username" name="username" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="password" class="form-label">Mot de passe</label>
+                                        <input type="password" class="form-control" id="password" name="password" required>
+                                    </div>
+                                    <div class="error-message" id="loginError"></div>
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                                        <label class="form-check-label" for="remember">Se souvenir de moi</label>
+                                    </div>
+                                    <div class="d-grid gap-3">
+                                        <button type="submit" class="btn btn-primary">Se connecter</button>
+                                        <a href="{{ url_for('index') }}" class="btn btn-return">
+                                            <i class="bi bi-arrow-left me-2"></i>Retour à l'accueil
+                                        </a>
+                                    </div>
+                                </form>
+                                <script>
+                                    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+                                        e.preventDefault();
+                                        
+                                        // Reset error states
+                                        document.getElementById('loginError').classList.remove('show');
+                                        document.getElementById('username').classList.remove('error');
+                                        document.getElementById('password').classList.remove('error');
+                                        
+                                        // Get form data
+                                        const formData = new FormData(this);
+                                        
+                                        try {
+                                            // Send login request
+                                            const response = await fetch("{{ url_for('auth.login') }}", {
+                                                method: 'POST',
+                                                body: formData,
+                                                headers: {
+                                                    'X-Requested-With': 'XMLHttpRequest'
+                                                }
+                                            });
+                                            
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            
+                                            const data = await response.json();
+                                            
+                                            if (data.success) {
+                                                // Show success animation
+                                                const overlay = document.querySelector('.login-animation-overlay');
+                                                overlay.classList.add('active');
+                                                
+                                                // Expand after loading animation
+                                                setTimeout(() => {
+                                                    overlay.classList.add('expand');
+                                                    setTimeout(() => {
+                                                        window.location.href = data.redirect;
+                                                    }, 800);
+                                                }, 2000);
+                                            } else {
+                                                // Show error message
+                                                const errorMsg = document.getElementById('loginError');
+                                                errorMsg.textContent = data.message || "Nom d'utilisateur ou mot de passe incorrect";
+                                                errorMsg.classList.add('show');
+                                                
+                                                // Highlight error fields
+                                                document.getElementById('username').classList.add('error');
+                                                document.getElementById('password').classList.add('error');
+                                                
+                                                // Clear password field
+                                                document.getElementById('password').value = '';
+                                            }
+                                        } catch (error) {
+                                            console.error('Login error:', error);
+                                            const errorMsg = document.getElementById('loginError');
+                                            errorMsg.textContent = "Une erreur s'est produite. Veuillez réessayer.";
+                                            errorMsg.classList.add('show');
+                                        }
+                                    });
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

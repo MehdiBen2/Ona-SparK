@@ -1,0 +1,556 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- En-tête -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-users-gear me-2 text-primary"></i>
+                    <span class="gradient-text">Gestion des Profils</span>
+                </h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Tableau de Bord</a></li>
+                        <li class="breadcrumb-item active">Profils Utilisateurs</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Filtres -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="glass-card">
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="search-wrapper">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" id="searchInput" class="form-control modern-input" 
+                                       placeholder="Rechercher par nom, email ou fonction...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select modern-select" id="unitFilter">
+                                <option value="">Toutes les Unités</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select modern-select" id="jobFilter">
+                                <option value="">Toutes les Fonctions</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="date" class="form-control modern-input" id="dateFilter" placeholder="Date de Recrutement">
+                        </div>
+                        <div class="col-md-2">
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('manage_units') }}" class="btn btn-outline-primary modern-btn flex-grow-1">
+                                    <i class="fas fa-building me-1"></i> Unités
+                                </a>
+                                <button class="btn btn-primary modern-btn" onclick="refreshTable()" id="refreshBtn">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Tableau -->
+    <div class="row">
+        <div class="col-12">
+            <div class="glass-card">
+                <div class="card-body p-0">
+                    <div class="table-responsive modern-table">
+                        <table class="table table-hover align-middle mb-0" id="profilesTable">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-3" onclick="sortTable(0)">
+                                        <div class="d-flex align-items-center">
+                                            Nom <i class="fas fa-sort ms-2"></i>
+                                        </div>
+                                    </th>
+                                    <th class="px-4 py-3" onclick="sortTable(1)">
+                                        <div class="d-flex align-items-center">
+                                            Email <i class="fas fa-sort ms-2"></i>
+                                        </div>
+                                    </th>
+                                    <th class="px-4 py-3" onclick="sortTable(2)">
+                                        <div class="d-flex align-items-center">
+                                            Numéro Professionnel <i class="fas fa-sort ms-2"></i>
+                                        </div>
+                                    </th>
+                                    <th class="px-4 py-3" onclick="sortTable(3)">
+                                        <div class="d-flex align-items-center">
+                                            Fonction <i class="fas fa-sort ms-2"></i>
+                                        </div>
+                                    </th>
+                                    <th class="px-4 py-3" onclick="sortTable(4)">
+                                        <div class="d-flex align-items-center">
+                                            Unité <i class="fas fa-sort ms-2"></i>
+                                        </div>
+                                    </th>
+                                    <th class="px-4 py-3" onclick="sortTable(5)">
+                                        <div class="d-flex align-items-center">
+                                            Date de Recrutement <i class="fas fa-sort ms-2"></i>
+                                        </div>
+                                    </th>
+                                    <th class="px-4 py-3 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for profile in profiles %}
+                                <tr class="border-bottom">
+                                    <td class="px-4 py-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="modern-avatar">
+                                                {{ profile.first_name[0] }}{{ profile.last_name[0] }}
+                                            </div>
+                                            <div class="ms-3">
+                                                <div class="fw-semibold">{{ profile.first_name }} {{ profile.last_name }}</div>
+                                                <small class="text-muted">ID: {{ profile.professional_number }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3">{{ profile.email }}</td>
+                                    <td class="px-4 py-3">{{ profile.professional_number }}</td>
+                                    <td class="px-4 py-3">
+                                        <span class="modern-badge">
+                                            {{ profile.job_function }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span class="modern-badge-primary">
+                                            {{ profile.user.unit.name if profile.user.unit else 'N/A' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3">{{ profile.recruitment_date.strftime('%d/%m/%Y') }}</td>
+                                    <td class="px-4 py-3 text-center">
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-light-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                Actions
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#" onclick="viewProfile({{ profile.id }})">
+                                                    <i class="fas fa-eye me-2"></i>Voir le Profil
+                                                </a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="editProfile({{ profile.id }})">
+                                                    <i class="fas fa-edit me-2"></i>Modifier
+                                                </a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item text-danger" href="#" onclick="deleteProfile({{ profile.id }})">
+                                                    <i class="fas fa-trash-alt me-2"></i>Supprimer
+                                                </a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="toast" class="toast modern-toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <i class="fas fa-info-circle me-2 text-primary"></i>
+            <strong class="me-auto">Notification</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Fermer"></button>
+        </div>
+        <div class="toast-body"></div>
+    </div>
+</div>
+
+<style>
+:root {
+    --primary-color: #2196F3;
+    --primary-dark: #1976D2;
+    --primary-light: #BBDEFB;
+    --secondary-color: #607D8B;
+    --success-color: #4CAF50;
+    --warning-color: #FFC107;
+    --danger-color: #F44336;
+}
+
+.gradient-text {
+    background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 600;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.1);
+}
+
+.search-wrapper {
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+}
+
+.modern-input {
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    padding: 0.6rem 1rem;
+    padding-left: 35px;
+    transition: all 0.3s ease;
+}
+
+.modern-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+.modern-select {
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    padding: 0.6rem 1rem;
+    background-image: linear-gradient(45deg, transparent 50%, #666 50%),
+                      linear-gradient(135deg, #666 50%, transparent 50%);
+    background-position: calc(100% - 20px) calc(1em + 2px),
+                         calc(100% - 15px) calc(1em + 2px);
+    background-size: 5px 5px,
+                    5px 5px;
+    background-repeat: no-repeat;
+}
+
+.modern-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+    text-transform: uppercase;
+}
+
+.modern-badge {
+    padding: 0.5em 1em;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: rgba(33, 150, 243, 0.1);
+    color: var(--primary-color);
+    border: 1px solid rgba(33, 150, 243, 0.2);
+    transition: all 0.3s ease;
+}
+
+.modern-badge-primary {
+    background: rgba(33, 150, 243, 0.1);
+    color: var(--primary-color);
+    border: 1px solid rgba(33, 150, 243, 0.2);
+    padding: 0.5em 1em;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.modern-table {
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.modern-table thead th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #2c3e50;
+    border-bottom: 2px solid #e9ecef;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.modern-table thead th:hover {
+    background-color: #e9ecef;
+}
+
+.modern-table tbody tr:hover {
+    background-color: rgba(33, 150, 243, 0.02);
+}
+
+.modern-btn {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.modern-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-light-primary {
+    background: rgba(33, 150, 243, 0.1);
+    color: var(--primary-color);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-light-primary:hover {
+    background: rgba(33, 150, 243, 0.2);
+    color: var(--primary-dark);
+}
+
+.modern-toast {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.spinning {
+    animation: spin 0.8s linear infinite;
+}
+</style>
+
+<script>
+let sortDirection = 1;
+let lastSortedColumn = -1;
+
+// Initialize tooltips and filters
+document.addEventListener('DOMContentLoaded', function() {
+    const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltips.forEach(tooltip => new bootstrap.Tooltip(tooltip));
+    
+    document.getElementById('searchInput').placeholder = 'Rechercher par nom, email ou fonction...';
+    document.getElementById('dateFilter').placeholder = 'Date de recrutement';
+    
+    populateFilters();
+});
+
+function sortTable(columnIndex) {
+    const table = document.getElementById('profilesTable');
+    const tbody = table.getElementsByTagName('tbody')[0];
+    const rows = Array.from(tbody.getElementsByTagName('tr'));
+    
+    // Update sort icons
+    const headers = table.getElementsByTagName('th');
+    for (let i = 0; i < headers.length; i++) {
+        const icon = headers[i].querySelector('.fas');
+        if (i === columnIndex) {
+            icon.className = `fas fa-sort-${sortDirection === 1 ? 'down' : 'up'} ms-2`;
+        } else {
+            icon.className = 'fas fa-sort ms-2';
+        }
+    }
+
+    if (lastSortedColumn === columnIndex) {
+        sortDirection *= -1;
+    } else {
+        sortDirection = 1;
+        lastSortedColumn = columnIndex;
+    }
+
+    rows.sort((a, b) => {
+        const aValue = a.cells[columnIndex].textContent.trim();
+        const bValue = b.cells[columnIndex].textContent.trim();
+        return aValue.localeCompare(bValue) * sortDirection;
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+const searchProfiles = debounce(async () => {
+    const searchQuery = document.getElementById('searchInput').value;
+    const unitFilter = document.getElementById('unitFilter').value;
+    const jobFilter = document.getElementById('jobFilter').value;
+    const dateFilter = document.getElementById('dateFilter').value;
+
+    try {
+        const params = new URLSearchParams({
+            q: searchQuery,
+            unit: unitFilter,
+            job: jobFilter,
+            date: dateFilter
+        });
+        
+        const response = await fetch(`/api/profiles/search?${params}`);
+        const profiles = await response.json();
+        updateTable(profiles);
+    } catch (error) {
+        console.error('Erreur lors de la recherche:', error);
+        showToast('Erreur lors de la recherche des profils', 'error');
+    }
+}, 300);
+
+// Add event listeners for all filters
+['searchInput', 'unitFilter', 'jobFilter', 'dateFilter'].forEach(id => {
+    document.getElementById(id).addEventListener('input', searchProfiles);
+});
+
+function updateTable(profiles) {
+    const tbody = document.querySelector('#profilesTable tbody');
+    tbody.innerHTML = profiles.map(profile => `
+        <tr class="border-bottom">
+            <td class="px-4 py-3">
+                <div class="d-flex align-items-center">
+                    <div class="modern-avatar">
+                        ${profile.first_name[0]}${profile.last_name[0]}
+                    </div>
+                    <div class="ms-3">
+                        <div class="fw-semibold">${profile.first_name} ${profile.last_name}</div>
+                        <small class="text-muted">ID: ${profile.professional_number}</small>
+                    </div>
+                </div>
+            </td>
+            <td class="px-4 py-3">${profile.email}</td>
+            <td class="px-4 py-3">${profile.professional_number}</td>
+            <td class="px-4 py-3">
+                <span class="modern-badge">
+                    ${profile.job_function}
+                </span>
+            </td>
+            <td class="px-4 py-3">
+                <span class="modern-badge-primary">
+                    ${profile.unit || 'N/A'}
+                </span>
+            </td>
+            <td class="px-4 py-3">${new Date(profile.recruitment_date).toLocaleDateString('fr-FR')}</td>
+            <td class="px-4 py-3 text-center">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-light-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Actions
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" onclick="viewProfile(${profile.id})">
+                            <i class="fas fa-eye me-2"></i>Voir le Profil
+                        </a></li>
+                        <li><a class="dropdown-item" href="#" onclick="editProfile(${profile.id})">
+                            <i class="fas fa-edit me-2"></i>Modifier
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#" onclick="deleteProfile(${profile.id})">
+                            <i class="fas fa-trash-alt me-2"></i>Supprimer
+                        </a></li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function viewProfile(profileId) {
+    window.location.href = `{{ url_for('profiles.view_user_profile', user_id=0) }}`.replace('0', profileId);
+}
+
+function editProfile(profileId) {
+    window.location.href = `{{ url_for('profiles.edit_user_profile', user_id=0) }}`.replace('0', profileId);
+}
+
+function deleteProfile(profileId) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce profil ?')) {
+        fetch(`/api/profiles/${profileId}`, { method: 'DELETE' })
+            .then(response => {
+                if (response.ok) {
+                    showToast('Profil supprimé avec succès', 'success');
+                    refreshTable();
+                } else {
+                    throw new Error('Erreur lors de la suppression');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                showToast('Erreur lors de la suppression du profil', 'error');
+            });
+    }
+}
+
+async function refreshTable() {
+    const refreshBtn = document.getElementById('refreshBtn');
+    const icon = refreshBtn.querySelector('i');
+    icon.classList.add('spinning');
+    refreshBtn.disabled = true;
+
+    try {
+        const response = await fetch('/api/profiles/all');
+        const profiles = await response.json();
+        updateTable(profiles);
+        showToast('Profils actualisés avec succès', 'success');
+    } catch (error) {
+        console.error('Erreur lors de l\'actualisation:', error);
+        showToast('Erreur lors de l\'actualisation des profils', 'error');
+    } finally {
+        setTimeout(() => {
+            icon.classList.remove('spinning');
+            refreshBtn.disabled = false;
+        }, 500);
+    }
+}
+
+async function populateFilters() {
+    try {
+        const response = await fetch('/api/profiles/filters');
+        const { units, jobFunctions } = await response.json();
+        
+        const unitSelect = document.getElementById('unitFilter');
+        const jobSelect = document.getElementById('jobFilter');
+        
+        units.forEach(unit => {
+            unitSelect.add(new Option(unit.name, unit.id));
+        });
+        
+        jobFunctions.forEach(job => {
+            jobSelect.add(new Option(job, job));
+        });
+    } catch (error) {
+        console.error('Erreur lors du chargement des filtres:', error);
+    }
+}
+
+function showToast(message, type = 'info') {
+    const toast = new bootstrap.Toast(document.getElementById('toast'));
+    const toastBody = document.querySelector('.toast-body');
+    toastBody.textContent = message;
+    toast.show();
+}
+</script>
+{% endblock %}

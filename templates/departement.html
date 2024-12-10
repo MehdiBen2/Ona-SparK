@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Départements ONA</h2>
+    <div class="row g-4">
+        <!-- Exploitation et Maintenance -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-industry fa-2x text-primary me-3"></i>
+                        <h5 class="card-title mb-0">Exploitation et Maintenance</h5>
+                    </div>
+                    <p class="card-text">Gestion des opérations d'exploitation et maintenance des installations.</p>
+                    <a href="{{ url_for('exploitation') }}" class="btn btn-primary">
+                        <i class="fas fa-arrow-right"></i> Accéder
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Moyens Généraux -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-tools fa-2x text-success me-3"></i>
+                        <h5 class="card-title mb-0">Moyens Généraux</h5>
+                    </div>
+                    <p class="card-text">Gestion des ressources et équipements généraux de l'organisation.</p>
+                    <a href="#" class="btn btn-success">
+                        <i class="fas fa-arrow-right"></i> Accéder
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Finance -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-money-bill-wave fa-2x text-info me-3"></i>
+                        <h5 class="card-title mb-0">Finance</h5>
+                    </div>
+                    <p class="card-text">Gestion financière et comptable de l'organisation.</p>
+                    <a href="#" class="btn btn-info text-white">
+                        <i class="fas fa-arrow-right"></i> Accéder
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- DRH -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-users fa-2x text-warning me-3"></i>
+                        <h5 class="card-title mb-0">DRH</h5>
+                    </div>
+                    <p class="card-text">Gestion des ressources humaines et du personnel.</p>
+                    <a href="#" class="btn btn-warning text-dark">
+                        <i class="fas fa-arrow-right"></i> Accéder
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- HSE -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-hard-hat fa-2x text-danger me-3"></i>
+                        <h5 class="card-title mb-0">HSE</h5>
+                    </div>
+                    <p class="card-text">Hygiène, Sécurité et Environnement.</p>
+                    <a href="#" class="btn btn-danger">
+                        <i class="fas fa-arrow-right"></i> Accéder
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn {
+        border-radius: 20px;
+        padding: 8px 20px;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateX(5px);
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .fa-2x {
+        width: 40px;
+        text-align: center;
+    }
+</style>
+{% endblock %}

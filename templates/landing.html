@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ONA - Office National de l'Assainissement</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+    <style>
+        /* Background Slideshow */
+        .bg-slideshow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-slideshow div {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+
+        .bg-slideshow div.active {
+            opacity: 1;
+        }
+
+        #slide1 { background-image: url("{{ url_for('static', filename='images/onabg/ona1.jpg') }}"); }
+        #slide2 { background-image: url("{{ url_for('static', filename='images/onabg/ona2.jpg') }}"); }
+        #slide3 { background-image: url("{{ url_for('static', filename='images/onabg/ona3.jpg') }}"); }
+
+        /* Add overlay to make text more readable */
+        .bg-overlay {
+           
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        /* Text Animation */
+        .animated-text {
+            position: relative;
+            height: 150px; /* Increased height to fit text better */
+            overflow: hidden;
+            margin-bottom: 1px; /* Add some space below */
+        }
+
+        .text-slide {
+            position: absolute;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1.2s ease; /* Slightly longer transition */
+            line-height: 1.2; /* Better line height for text */
+        }
+
+        .text-slide.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .text-slide.inactive {
+            opacity: 0;
+            transform: translateY(-50px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Slideshow -->
+    <div class="bg-slideshow">
+        <div id="slide1" class="active"></div>
+        <div id="slide2"></div>
+        <div id="slide3"></div>
+    </div>
+    <div class="bg-overlay"></div>
+    <!-- Modern Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <img src="{{ url_for('static', filename='images/Ona_Blogo.png') }}" alt="ONA Logo" class="nav-logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('index') }}">Accueil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#services">Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">À propos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-primary login-btn" href="{{ url_for('auth.login') }}">
+                            <i class="bi bi-person-circle me-2"></i>Connexion
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="animated-text">
+                        <h1 class="display-4 fw-bold text-slide active" id="text1">Office National de l'Assainissement</h1>
+                        <h1 class="display-4 fw-bold text-slide" id="text2">L'eau lave tous, L'ONA épure l'eau</h1>
+                    </div>
+                    <p class="lead mb-4">Plateforme interne dédiée aux employés de l'ONA pour consulter les informations, gérer les archives, accéder aux données et rédiger des bilans</p>
+                    <div class="hero-buttons">
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-platform btn-lg me-3">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Accéder à la Plateforme
+                        </a>
+                        <a href="#services" class="btn btn-discover btn-lg">
+                            <i class="bi bi-info-circle me-2"></i>Découvrir Plus
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <img src="{{ url_for('static', filename='images/ona-logo.png') }}" alt="ONA Logo" class="hero-logo img-fluid" style="max-width: 650px; filter: brightness(0) invert(1);">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <h2 class="text-center mb-5">Le Portail vous permet</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="service-card">
+                        <i class="bi bi-database-check"></i>
+                        <h3>Gestion des Données</h3>
+                        <p>Centralisez et gérez efficacement toutes vos données d'entreprise</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="service-card">
+                        <i class="bi bi-graph-up"></i>
+                        <h3>Analyses et Rapports</h3>
+                        <p>Générez des rapports détaillés et des analyses approfondies</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="service-card">
+                        <div class="icon-box">
+                            <i class="bi bi-map"></i>
+                        </div>
+                        <h3>Vue des Incidents sur Carte</h3>
+                        <p>Visualisez et localisez les incidents signalés sur une carte interactive</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h2 class="mb-4">À Propos de la Plateforme</h2>
+                    <p class="lead mb-4">Une solution moderne pour la gestion des données de l'ONA</p>
+                    <p class="about-text">ONA SparK offre une interface intuitive et sécurisée pour la gestion centralisée des données, permettant une collaboration efficace entre les différents services.</p>
+                </div>
+                <div class="col-lg-6">
+                    <div class="about-image text-center">
+                        <img src="{{ url_for('static', filename='images/SPARK.png') }}" alt="SPARK Logo" class="about-logo">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="text-center mb-5">Contactez-nous</h2>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <i class="bi bi-geo-alt-fill"></i>
+                            <h4>Adresse</h4>
+                            <p>Carrefour Sidi Arcine Route de Baraki Alger</p>
+                        </div>
+                        <div class="contact-item">
+                            <i class="bi bi-telephone-fill"></i>
+                            <h4>Téléphone</h4>
+                            <p>+213 (0) 23 82 28 32</p>
+                        </div>
+                        <div class="contact-item">
+                            <i class="bi bi-envelope-fill"></i>
+                            <h4>Email</h4>
+                            <p>contact@ona.dz</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p>&copy; 2024 Office National de l'Assainissement. Tous droits réservés.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="text-white me-3">source code mehdi benhenni │</a>
+                    <a href="#" class="text-white">Spark engine made by mehdi</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/parallax.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/landing.js') }}"></script>
+    <script>
+        // Background Slideshow
+        document.addEventListener('DOMContentLoaded', function() {
+            const slides = document.querySelectorAll('.bg-slideshow div');
+            let currentSlide = 0;
+
+            function nextSlide() {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }
+
+            // Change slide every 5 seconds
+            setInterval(nextSlide, 5000);
+
+            // Text Animation
+            const textSlides = document.querySelectorAll('.text-slide');
+            let currentText = 0;
+
+            function nextText() {
+                textSlides[currentText].classList.add('inactive');
+                textSlides[currentText].classList.remove('active');
+                
+                currentText = (currentText + 1) % textSlides.length;
+                
+                textSlides[currentText].classList.remove('inactive');
+                textSlides[currentText].classList.add('active');
+            }
+
+            // Change text every 5.5 seconds
+            setInterval(nextText, 5500);
+        });
+    </script>
+</body>
+</html>

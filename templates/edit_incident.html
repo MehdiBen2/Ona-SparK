@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Modifier l'Incident{% endblock %}
+
+{% block extra_css %}
+<link href="{{ url_for('static', filename='css/base.css') }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/incident-form.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 incident-form">
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-1">Modifier l'Incident</h4>
+                    <p class="mb-0 text-white-50">
+                        <i class="fas fa-calendar me-2"></i>Créé le {{ incident.date_incident.strftime('%d/%m/%Y à %H:%M') }}
+                    </p>
+                </div>
+                <a href="{{ url_for('view_incident', incident_id=incident.id) }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Retour aux détails
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('edit_incident', incident_id=incident.id) }}">
+                <div class="location-info">
+                    <h5 class="mb-3">Informations de localisation</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="info-item">
+                                <span class="info-label">Wilaya</span>
+                                <span class="info-value">{{ incident.wilaya }}</span>
+                            </div>
+                            <input type="hidden" name="wilaya" value="{{ incident.wilaya }}">
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-item">
+                                <span class="info-label">Commune</span>
+                                <span class="info-value">{{ incident.commune }}</span>
+                            </div>
+                            <input type="hidden" name="commune" value="{{ incident.commune }}">
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-item">
+                                <span class="info-label">Localité</span>
+                                <span class="info-value">{{ incident.localite }}</span>
+                            </div>
+                            <input type="hidden" name="localite" value="{{ incident.localite }}">
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden" name="latitude" value="{{ incident.latitude }}">
+                <input type="hidden" name="longitude" value="{{ incident.longitude }}">
+
+                <div class="form-section">
+                    <h5 class="form-section-title">Détails de l'incident</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label for="date_incident" class="form-label">
+                                <i class="fas fa-calendar-alt me-2"></i>Date de l'incident
+                            </label>
+                            <input type="datetime-local" class="form-control" id="date_incident" name="date_incident" 
+                                   value="{{ incident.date_incident.strftime('%Y-%m-%dT%H:%M') }}" required>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label for="gravite" class="form-label">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Niveau de gravité
+                            </label>
+                            <select class="form-select" id="gravite" name="gravite" required>
+                                <option value="Faible" {% if incident.gravite == 'Faible' %}selected{% endif %}>
+                                    🟢 Faible
+                                </option>
+                                <option value="Moyenne" {% if incident.gravite == 'Moyenne' %}selected{% endif %}>
+                                    🟡 Moyenne
+                                </option>
+                                <option value="Élevée" {% if incident.gravite == 'Élevée' %}selected{% endif %}>
+                                    🟠 Élevée
+                                </option>
+                                <option value="Critique" {% if incident.gravite == 'Critique' %}selected{% endif %}>
+                                    🔴 Critique
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="nature_cause" class="form-label">
+                            <i class="fas fa-info-circle me-2"></i>Nature et cause de l'incident
+                        </label>
+                        <textarea class="form-control" id="nature_cause" name="nature_cause" rows="3" required>{{ incident.nature_cause }}</textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="impact" class="form-label">
+                            <i class="fas fa-wave-square me-2"></i>Impact de l'incident
+                        </label>
+                        <textarea class="form-control" id="impact" name="impact" rows="3" required>{{ incident.impact }}</textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="mesures_prises" class="form-label">
+                            <i class="fas fa-tools me-2"></i>Mesures prises
+                        </label>
+                        <textarea class="form-control" id="mesures_prises" name="mesures_prises" rows="3" required>{{ incident.mesures_prises }}</textarea>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <button type="button" class="btn btn-secondary" onclick="history.back()">
+                        <i class="fas fa-times me-2"></i>Annuler
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Enregistrer les modifications
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add animation to save button on hover
+    const saveBtn = document.querySelector('.btn-primary');
+    saveBtn.addEventListener('mouseover', function() {
+        this.querySelector('i').classList.add('fa-bounce');
+    });
+    saveBtn.addEventListener('mouseout', function() {
+        this.querySelector('i').classList.remove('fa-bounce');
+    });
+});
+</script>
+{% endblock %}

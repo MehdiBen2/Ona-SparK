@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Fusionner l'incident avec une autre unité</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Incident #{{ incident.id }}</h5>
+            <p class="card-text">
+                <strong>Unité actuelle:</strong> {{ incident.unit.name if incident.unit else 'Non assigné' }}<br>
+                <strong>Date de l'incident:</strong> {{ incident.date_incident.strftime('%d/%m/%Y %H:%M') }}<br>
+                <strong>Localité:</strong> {{ incident.localite }}<br>
+                <strong>Nature/Cause:</strong> {{ incident.nature_cause }}
+            </p>
+
+            <form method="POST">
+                <div class="form-group">
+                    <label for="new_unit">Nouvelle unité:</label>
+                    <select class="form-control" id="new_unit" name="new_unit" required>
+                        <option value="">Sélectionnez une unité</option>
+                        {% for unit in units %}
+                            {% if unit.id != incident.unit_id %}
+                                <option value="{{ unit.id }}">{{ unit.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group mt-3">
+                    <label for="merge_note">Note de fusion (optionnel):</label>
+                    <textarea class="form-control" id="merge_note" name="merge_note" rows="3" 
+                              placeholder="Ajoutez une note expliquant la raison de la fusion..."></textarea>
+                </div>
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Fusionner l'incident</button>
+                    <a href="{{ url_for('view_incident', incident_id=incident.id) }}" class="btn btn-secondary">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

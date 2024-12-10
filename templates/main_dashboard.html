@@ -1,0 +1,479 @@
+{% extends "base.html" %}
+
+{% block title %}ONA - Page Principale{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes slideToCenter {
+        0% {
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+        100% {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes subtleSlideUp {
+        0% {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid var(--ona-primary);
+        border-radius: 50%;
+        animation: rotate 1s linear infinite;
+        margin: 10px auto;
+        display: none;
+    }
+
+    .loading .loading-spinner {
+        display: block;
+    }
+
+    .loading .stat-number {
+        display: none;
+    }
+
+    .dashboard-wrapper {
+        background-color: #f8f9fa;
+        min-height: calc(100vh - 56px);
+        padding-bottom: 2rem;
+    }
+
+    .background-container {
+        position: relative;
+        width: 100%;
+        background: linear-gradient(135deg, #356ee7 0%, #137fbd 100%);
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        color: white;
+        text-align: center;
+    }
+
+    .background-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("{{ url_for('static', filename='images/water-pattern.png') }}");
+        background-size: cover;
+        opacity: 0.1;
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .header-title {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        animation: subtleSlideUp 1.2s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+        transform-origin: center top;
+    }
+
+    h2 {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+        font-weight: 500;
+        animation: subtleSlideUp 1.3s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+    }
+
+    .unit-name {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+        animation: subtleSlideUp 1.4s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+    }
+
+    .welcome-message {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        animation: subtleSlideUp 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+    }
+
+    .dashboard-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #666;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-trend {
+        font-size: 0.9rem;
+        color: #28a745;
+    }
+
+    .stat-card.primary { border-left: 5px solid var(--ona-primary); }
+    .stat-card.secondary { border-left: 5px solid var(--ona-secondary); }
+    .stat-card.success { border-left: 5px solid var(--ona-success); }
+    .stat-card.warning { border-left: 5px solid var(--ona-warning); }
+
+    .action-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        height: 100%;
+    }
+
+    .action-card h4 {
+        color: var(--ona-primary);
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--ona-accent);
+    }
+
+    .action-btn {
+        display: block;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 10px;
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .action-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        transition: width 0.3s ease;
+        z-index: -1;
+    }
+
+    .action-btn:hover::before {
+        width: 100%;
+    }
+
+    .action-btn:hover {
+        transform: translateX(5px);
+        color: white;
+    }
+
+    .action-btn i {
+        width: 24px;
+        text-align: center;
+        margin-right: 8px;
+    }
+
+    .action-btn.primary { background: linear-gradient(135deg, var(--ona-primary), var(--ona-secondary)); }
+    .action-btn.secondary { background: linear-gradient(135deg, #4a90e2, #357abd); }
+    .action-btn.info { background: linear-gradient(135deg, #0dcaf0, #0b96b2); }
+    .action-btn.warning { background: linear-gradient(135deg, #ff9800, #f57c00); }
+    .action-btn.success { background: linear-gradient(135deg, #198754, #146c43); }
+    .action-btn.danger { background: linear-gradient(135deg, #dc3545, #b02a37); }
+
+    .incident-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease;
+        margin-bottom: 1rem;
+    }
+
+    .incident-card:hover {
+        transform: translateX(5px);
+    }
+
+    .status-badge {
+        padding: 0.25rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .status-resolved {
+        background-color: #d1e7dd;
+        color: #0f5132;
+    }
+
+    .status-pending {
+        background-color: #fff3cd;
+        color: #664d03;
+    }
+
+    /* Spark background image in bottom right */
+    body::after {
+        content: '';
+        position: fixed;
+        bottom: 5vh;  
+        right: 5vh;   
+        width: 350px;   
+        height: 350px;  
+        background-image: url('/static/images/sparkbg.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: bottom right;
+        opacity: 0.9;
+        pointer-events: none;
+        z-index:  auto;
+        
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const statCards = document.querySelectorAll('.stat-card');
+        
+        // Add loading state initially
+        statCards.forEach(card => card.classList.add('loading'));
+
+        // Fetch dashboard stats
+        fetch('/api/dashboard-stats')
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    const data = result.data;
+                    
+                    // Update stats based on user role
+                    if ('users_count' in data) {
+                        // Admin stats
+                        updateStatValue('users-count', data.users_count);
+                        updateStatValue('units-count', data.units_count);
+                        updateStatValue('zones-count', data.zones_count);
+                        updateStatValue('centers-count', data.centers_count);
+                    } else {
+                        // User stats
+                        updateStatValue('total-incidents', data.total_incidents);
+                        updateStatValue('resolved-incidents', data.resolved_incidents);
+                        updateStatValue('pending-incidents', data.pending_incidents);
+                    }
+
+                    // Remove loading state with staggered animation
+                    statCards.forEach((card, index) => {
+                        setTimeout(() => {
+                            card.classList.remove('loading');
+                        }, index * 200 + 300);
+                    });
+                } else {
+                    console.error('Failed to fetch dashboard stats:', result.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching dashboard stats:', error);
+                // Remove loading state if there's an error
+                statCards.forEach(card => card.classList.remove('loading'));
+            });
+    });
+
+    function updateStatValue(id, value) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = value;
+        }
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Background Image -->
+    <div class="background-container">
+        <div class="background-image"></div>
+        <div class="dashboard-header">
+            <div class="container">
+                <div class="header-content">
+                    <img src="{{ url_for('static', filename='images/ona_logo.png') }}" alt="ONA Logo" 
+                         style="width: 120px; height: auto; margin-bottom: 1.5rem; filter: brightness(0) invert(1); 
+                                animation: subtleSlideUp 1.2s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+                                transform-origin: center top;">
+                    <h1 class="header-title">Office National de l'Assainissement</h1>
+                    <h2>ONA SparK Medy</h2>
+                    <p class="unit-name">{{ current_user.unite }}</p>
+                    <p class="welcome-message">
+                        Bienvenue , {{ current_user.username }} | {{ datetime.now().strftime('%d %B %Y') }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <!-- Quick Actions Column -->
+            <div class="col-lg-4">
+                <div class="action-card">
+                    <h4><i class="fas fa-bolt me-2"></i>Actions Rapides</h4>
+                    <a href="{{ url_for('new_incident') }}" class="action-btn primary">
+                        <i class="fas fa-plus-circle"></i>Nouvel Incident
+                    </a>
+                    <a href="{{ url_for('incident_list') }}" class="action-btn secondary">
+                        <i class="fas fa-list"></i>Liste des Incidents
+                    </a>
+                    {% if current_user.role == 'Admin' %}
+                    <a href="{{ url_for('list_zones') }}" class="action-btn info">
+                        <i class="fas fa-map-marker-alt"></i>Liste des Zones
+                    </a>
+                    <a href="{{ url_for('manage_units') }}" class="action-btn warning">
+                        <i class="fas fa-building"></i>Gestion des Unités
+                    </a>
+                    <a href="{{ url_for('list_centers') }}" class="action-btn success">
+                        <i class="fas fa-building"></i>Liste des Centres
+                    </a>
+                    <a href="{{ url_for('manage_users') }}" class="action-btn danger">
+                        <i class="fas fa-users"></i>Gestion des Utilisateurs
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('list_centers') }}" class="action-btn success">
+                        <i class="fas fa-building"></i>Liste des Centres
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Stats/Incidents Column -->
+            <div class="col-lg-8">
+                {% if current_user.role == 'Admin' or current_user.role == 'Employeur DG' %}
+                <!-- Admin Stats -->
+                <div class="dashboard-cards">
+                    <div class="stat-card primary loading">
+                        <div class="stat-icon text-primary">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="loading-spinner"></div>
+                        <div class="stat-number" id="users-count">-</div>
+                        <div class="stat-label">Utilisateurs Total</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-arrow-up"></i> Actif
+                        </div>
+                    </div>
+
+                    <div class="stat-card secondary loading">
+                        <div class="stat-icon text-secondary">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="loading-spinner"></div>
+                        <div class="stat-number" id="units-count">-</div>
+                        <div class="stat-label">Unités Total</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-check"></i> Opérationnel
+                        </div>
+                    </div>
+
+                    <div class="stat-card success loading">
+                        <div class="stat-icon text-success">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="loading-spinner"></div>
+                        <div class="stat-number" id="zones-count">-</div>
+                        <div class="stat-label">Zones Total</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-check"></i> Actif
+                        </div>
+                    </div>
+
+                    <div class="stat-card warning loading">
+                        <div class="stat-icon text-warning">
+                            <i class="fas fa-city"></i>
+                        </div>
+                        <div class="loading-spinner"></div>
+                        <div class="stat-number" id="centers-count">-</div>
+                        <div class="stat-label">Centres Total</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-check"></i> Opérationnel
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <!-- User Incidents -->
+                <div class="dashboard-cards">
+                    <div class="stat-card primary loading">
+                        <div class="stat-icon text-primary">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="loading-spinner"></div>
+                        <div class="stat-number" id="total-incidents">-</div>
+                        <div class="stat-label">Total des Incidents</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-chart-line"></i> En cours
+                        </div>
+                    </div>
+
+                    <div class="stat-card success loading">
+                        <div class="stat-icon text-success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="loading-spinner"></div>
+                        <div class="stat-number" id="resolved-incidents">-</div>
+                        <div class="stat-label">Incidents Résolus</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-arrow-up"></i> Terminé
+                        </div>
+                    </div>
+
+                    <div class="stat-card warning loading">
+                        <div class="stat-icon text-warning">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="loading-spinner"></div>
+                        <div class="stat-number" id="pending-incidents">-</div>
+                        <div class="stat-label">Incidents en Cours</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-spinner fa-spin"></i> En attente
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

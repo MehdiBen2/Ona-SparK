@@ -1,0 +1,424 @@
+/* Dashboard Styles */
+/* Header Styles */
+.dashboard-header.fade-in {
+    background: linear-gradient(135deg, #0061f2 0%, #0e83cd 50%, #00a6eb 100%);
+    color: white;
+    padding: 2.5rem 2rem;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 20px rgba(0, 97, 242, 0.15);
+    animation: fadeIn 0.5s ease-in-out;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dashboard-header.fade-in h4,
+.dashboard-header.fade-in h5,
+.dashboard-header.fade-in h6 {
+    margin: 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.dashboard-header.fade-in h4 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-header.fade-in h5 {
+    font-size: 1.25rem;
+    opacity: 0.95;
+    margin-bottom: 0.4rem;
+}
+
+.dashboard-header.fade-in h6 {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Add a subtle hover effect */
+.dashboard-header.fade-in:hover {
+    box-shadow: 0 12px 25px rgba(0, 97, 242, 0.2);
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+/* Action Buttons */
+.action-buttons .btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.action-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Incident Cards */
+.incident-card {
+    border: none;
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.incident-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.incident-card .card-header {
+    background: white;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.25rem;
+}
+
+.incident-card .severity-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-weight: 500;
+}
+
+.incident-card .btn-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.incident-card .btn-group .btn.btn-sm {
+    padding: 0;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border: none;
+    color: white;
+    cursor: pointer;
+    text-decoration: none;
+    position: relative;
+}
+
+.incident-card .btn-group .btn i {
+    font-size: 0.9rem;
+    pointer-events: none;
+}
+
+.incident-card .btn-group .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.incident-card .btn-group .btn.btn-outline-primary {
+    background-color: var(--ona-primary);
+}
+
+.incident-card .btn-group .btn.btn-outline-warning {
+    background-color: var(--ona-warning);
+}
+
+.incident-card .btn-group .btn.btn-outline-info {
+    background-color: var(--ona-info);
+}
+
+.incident-card .btn-group .btn.btn-outline-danger {
+    background-color: var(--ona-danger);
+}
+
+.incident-card .btn-group .btn.btn-outline-primary:hover {
+    background-color: #0082ba; /* Darker shade of primary */
+}
+
+.incident-card .btn-group .btn.btn-outline-warning:hover {
+    background-color: #e0a800; /* Darker shade of warning */
+}
+
+.incident-card .btn-group .btn.btn-outline-info:hover {
+    background-color: #138496; /* Darker shade of info */
+}
+
+.incident-card .btn-group .btn.btn-outline-danger:hover {
+    background-color: #c82333; /* Darker shade of danger */
+}
+
+.incident-card .btn-group .btn:active {
+    transform: translateY(1px);
+    box-shadow: none;
+}
+
+.incident-card .card-body {
+    padding: 1.5rem;
+}
+
+.incident-card .section-title {
+    color: var(--ona-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.incident-card .card-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1rem 1.5rem;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-weight: 500;
+}
+
+/* Action Button Group */
+.action-btn-group .btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    margin: 0 0.25rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.action-btn-group .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn-group .btn i {
+    font-size: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.action-btn-group .btn:hover i {
+    transform: scale(1.1);
+}
+
+/* Button variants */
+.btn-outline-primary {
+    border: 2px solid var(--ona-primary);
+    color: var(--ona-primary);
+}
+
+.btn-outline-primary:hover {
+    background: var(--ona-primary);
+    color: white;
+}
+
+.btn-outline-warning {
+    border: 2px solid var(--ona-warning);
+    color: var(--ona-warning);
+}
+
+.btn-outline-warning:hover {
+    background: var(--ona-warning);
+    color: white;
+}
+
+.btn-outline-info {
+    border: 2px solid var(--ona-info);
+    color: var(--ona-info);
+}
+
+.btn-outline-info:hover {
+    background: var(--ona-info);
+    color: white;
+}
+
+.btn-outline-danger {
+    border: 2px solid var(--ona-danger);
+    color: var(--ona-danger);
+}
+
+.btn-outline-danger:hover {
+    background: var(--ona-danger);
+    color: white;
+}
+
+/* Button group spacing and alignment */
+.incident-card .btn-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Active state for buttons */
+.btn:active {
+    transform: translateY(1px) !important;
+    box-shadow: none !important;
+}
+
+/* Modal Styles */
+.modal-content {
+    border: none;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 1.25rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1.25rem;
+    background-color: #f8f9fa;
+}
+
+/* Empty State */
+.empty-state {
+    padding: 4rem 2rem;
+    text-align: center;
+    background: #f8f9fa;
+    border-radius: 1rem;
+}
+
+.empty-state i {
+    color: var(--ona-gray);
+    margin-bottom: 1.5rem;
+}
+
+/* Floating Action Button */
+.floating-action-btn {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.floating-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+}
+
+/* Add subtle gray gradient to container */
+.container-fluid {
+    background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+    min-height: calc(90vh - 56px); /* Subtract navbar height */
+}
+
+/* List View Styles */
+#listView .table {
+    margin-bottom: 0;
+    background: white;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+#listView .table thead {
+    background: #f8f9fa;
+}
+
+#listView .table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+}
+
+#listView .table td {
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+#listView .table tbody tr {
+    transition: all 0.2s ease;
+}
+
+#listView .table tbody tr:hover {
+    background-color: rgba(0, 97, 242, 0.02);
+}
+
+#listView .text-truncate {
+    max-width: 300px;
+    display: inline-block;
+}
+
+#listView .btn-group .btn {
+    padding: 0.375rem 0.5rem;
+    line-height: 1;
+}
+
+#listView .btn-group .btn i {
+    font-size: 0.875rem;
+}
+
+#listView .severity-badge,
+#listView .status-badge {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 1rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .dashboard-header {
+        padding: 1.5rem 1rem;
+        text-align: center;
+    }
+    
+    .action-buttons {
+        margin-top: 1rem;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .incident-card .card-header {
+        flex-direction: column;
+        align-items: start !important;
+    }
+    
+    .incident-card .btn-group {
+        margin-top: 1rem;
+    }
+    
+    .incident-card .card-footer {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .action-btn-group {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

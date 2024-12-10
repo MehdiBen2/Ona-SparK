@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}Détails de l'Incident{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #e9e9e9da;
+    }
+    .incident-header {
+        background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .info-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        padding: 1.5rem;
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+    .info-card:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .info-title {
+        color: #1565c0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .info-title i {
+        font-size: 1.2rem;
+        opacity: 0.8;
+    }
+    .info-item {
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: baseline;
+    }
+    .info-label {
+        font-weight: 600;
+        min-width: 120px;
+        color: #444;
+    }
+    .info-value {
+        flex: 1;
+    }
+    .action-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+    .action-btn:hover {
+        transform: translateY(-1px);
+    }
+    .map-btn {
+        background: white;
+        color: #1565c0;
+        border: 1px solid #1565c0;
+        padding: 0.4rem 1rem;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+    .map-btn:hover {
+        background: #1565c0;
+        color: white;
+    }
+    .badge {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- Header Section -->
+    <div class="incident-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h4 class="mb-2">Incident #{{ incident.id }}</h4>
+                <div class="d-flex gap-2 align-items-center">
+                    <span class="badge bg-{{ 'danger' if incident.gravite == 'Critique' else 'warning' if incident.gravite == 'Élevée' else 'info' if incident.gravite == 'Moyenne' else 'success' }}">
+                        {{ incident.gravite }}
+                    </span>
+                    <span class="badge bg-{{ 'success' if incident.status == 'Résolu' else 'warning' }}">
+                        {{ incident.status }}
+                    </span>
+                    <span class="text-light opacity-75">
+                        <i class="far fa-clock me-1"></i>{{ incident.date_incident.strftime('%d/%m/%Y %H:%M') }}
+                    </span>
+                </div>
+            </div>
+            <div>
+                {% if current_user.role == 'Admin' %}
+                <a href="{{ url_for('edit_incident', incident_id=incident.id) }}" class="btn btn-warning action-btn me-2">
+                    <i class="fas fa-edit me-1"></i>Modifier
+                </a>
+                <a href="{{ url_for('merge_incident', incident_id=incident.id) }}" class="btn btn-info action-btn me-2">
+                    <i class="fas fa-code-branch me-1"></i>Fusionner l'unité
+                </a>
+                <button type="button" class="btn btn-danger action-btn me-2" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    <i class="fas fa-trash me-1"></i>Supprimer
+                </button>
+                {% endif %}
+                <a href="{{ url_for('incident_list') }}" class="btn btn-light action-btn">
+                    <i class="fas fa-arrow-left me-1"></i>Retour
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="row g-4">
+        <!-- Location Card -->
+        <div class="col-md-6">
+            <div class="info-card">
+                <h6 class="info-title">
+                    <i class="fas fa-map-marker-alt"></i>
+                    Localisation
+                </h6>
+                <div class="info-item">
+                    <span class="info-label">Wilaya:</span>
+                    <span class="info-value">{{ incident.wilaya }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Commune:</span>
+                    <span class="info-value">{{ incident.commune }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Localité:</span>
+                    <span class="info-value">{{ incident.localite }}</span>
+                </div>
+                <button type="button" class="map-btn mt-3" 
+                        onclick="showLocationMap('{{ incident.wilaya }}', '{{ incident.commune }}', '{{ incident.localite }}')">
+                    <i class="fas fa-map-marker-alt me-1"></i>Voir sur la carte
+                </button>
+            </div>
+        </div>
+
+        <!-- Nature & Cause Card -->
+        <div class="col-md-6">
+            <div class="info-card">
+                <h6 class="info-title">
+                    <i class="fas fa-exclamation-circle"></i>
+                    Nature et cause de l'incident
+                </h6>
+                <p class="mb-0">{{ incident.nature_cause }}</p>
+            </div>
+        </div>
+
+        <!-- Impact Card -->
+        <div class="col-md-6">
+            <div class="info-card">
+                <h6 class="info-title">
+                    <i class="fas fa-chart-line"></i>
+                    Impact
+                </h6>
+                <p class="mb-0">{{ incident.impact }}</p>
+            </div>
+        </div>
+
+        <!-- Measures Card -->
+        <div class="col-md-6">
+            <div class="info-card">
+                <h6 class="info-title">
+                    <i class="fas fa-tools"></i>
+                    Mesures prises
+                </h6>
+                <p class="mb-0">{{ incident.mesures_prises }}</p>
+            </div>
+        </div>
+
+        <!-- Reporter Info Card -->
+        <div class="col-md-6">
+            <div class="info-card">
+                <h6 class="info-title">
+                    <i class="fas fa-user"></i>
+                    Information de signalement
+                </h6>
+                <div class="info-item">
+                    <span class="info-label">Signalé par:</span>
+                    <span class="info-value">{{ incident.author.username }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Map Modal -->
+<div class="modal fade map-modal" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mapModalLabel">Localisation de l'incident</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="incident-map" class="map-container"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer cet incident ? Cette action est irréversible.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form action="{{ url_for('delete_incident', incident_id=incident.id) }}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Confirmer la suppression</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap modal
+    const mapModal = document.getElementById('mapModal');
+    mapModal.addEventListener('shown.bs.modal', function () {
+        if (incidentMap) {
+            incidentMap.invalidateSize();
+        }
+    });
+});
+</script>
+{% endblock %}

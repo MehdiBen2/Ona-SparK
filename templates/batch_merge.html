@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Fusion par lot d'incidents</h2>
+    <div class="card">
+        <div class="card-body">
+            <form method="POST">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label for="source_unit" class="form-label">Unité source:</label>
+                        <select class="form-select" id="source_unit" name="source_unit" required>
+                            <option value="">Sélectionnez une unité source</option>
+                            {% for unit in units %}
+                                <option value="{{ unit.id }}">{{ unit.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="target_unit" class="form-label">Unité de destination:</label>
+                        <select class="form-select" id="target_unit" name="target_unit" required>
+                            <option value="">Sélectionnez une unité de destination</option>
+                            {% for unit in units %}
+                                <option value="{{ unit.id }}">{{ unit.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div id="incidents_container" class="mb-4" style="display: none;">
+                    <h5>Incidents disponibles:</h5>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="select_all">
+                            <label class="form-check-label" for="select_all">
+                                Sélectionner tout
+                            </label>
+                        </div>
+                    </div>
+                    <div id="incidents_list" class="list-group">
+                        <!-- Incidents will be loaded here dynamically -->
+                    </div>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="merge_note">Note de fusion (optionnel):</label>
+                    <textarea class="form-control" id="merge_note" name="merge_note" rows="3" 
+                              placeholder="Ajoutez une note expliquant la raison de la fusion..."></textarea>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('incident_list') }}" class="btn btn-secondary">Annuler</a>
+                    <button type="submit" class="btn btn-primary" id="submit_btn" disabled>
+                        Fusionner les incidents
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sourceUnitSelect = document.getElementById('source_unit');
+    const targetUnitSelect = document.getElementById('target_unit');
+    const incidentsContainer = document.getElementById('incidents_container');
+    const incidentsList = document.getElementById('incidents_list');
+    const selectAllCheckbox = document.getElementById('select_all');
+    const submitBtn = document.getElementById('submit_btn');
+
+    // Load incidents when source unit is selected
+    sourceUnitSelect.addEventListener('change', function() {
+        const sourceUnitId = this.value;
+        const targetUnitId = targetUnitSelect.value;
+
+        if (sourceUnitId && sourceUnitId !== targetUnitId) {
+            fetch(`/get_unit_incidents/${sourceUnitId}`)
+                .then(response => response.json())
+                .then(incidents => {
+                    incidentsList.innerHTML = '';
+                    incidents.forEach(incident => {
+                        incidentsList.innerHTML += `
+                            <div class="list-group-item">
+                                <div class="form-check">
+                                    <input class="form-check-input incident-checkbox" type="checkbox" 
+                                           name="incidents" value="${incident.id}" id="incident_${incident.id}">
+                                    <label class="form-check-label" for="incident_${incident.id}">
+                                        #${incident.id} - ${incident.localite} - ${incident.nature_cause}
+                                        (${incident.date_incident})
+                                    </label>
+                                </div>
+                            </div>`;
+                    });
+                    incidentsContainer.style.display = 'block';
+                    updateSubmitButton();
+                });
+        } else {
+            incidentsContainer.style.display = 'none';
+        }
+    });
+
+    // Prevent selecting same unit for source and target
+    targetUnitSelect.addEventListener('change', function() {
+        const sourceUnitId = sourceUnitSelect.value;
+        const targetUnitId = this.value;
+
+        if (sourceUnitId === targetUnitId) {
+            alert('Les unités source et destination doivent être différentes');
+            this.value = '';
+        }
+        updateSubmitButton();
+    });
+
+    // Handle select all checkbox
+    selectAllCheckbox.addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.incident-checkbox');
+        checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+        updateSubmitButton();
+    });
+
+    // Update submit button state when individual checkboxes change
+    incidentsList.addEventListener('change', function(e) {
+        if (e.target.classList.contains('incident-checkbox')) {
+            updateSubmitButton();
+        }
+    });
+
+    function updateSubmitButton() {
+        const sourceUnitId = sourceUnitSelect.value;
+        const targetUnitId = targetUnitSelect.value;
+        const checkedIncidents = document.querySelectorAll('.incident-checkbox:checked');
+        
+        submitBtn.disabled = !(sourceUnitId && targetUnitId && checkedIncidents.length > 0);
+    }
+});
+</script>
+{% endblock %}

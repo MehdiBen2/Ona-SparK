@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="background-container">
+    <div class="background-image"></div>
+    <div class="content-wrapper">
+        <!-- En-tête -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">
+                        <i class="fas fa-user-plus me-2 text-primary"></i>
+                        <span class="gradient-text">Créer un Profil</span>
+                    </h2>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Tableau de Bord</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('profiles.admin_profiles') }}">Profils</a></li>
+                            <li class="breadcrumb-item active">Nouveau Profil</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulaire -->
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <form method="POST" action="{{ url_for('profiles.create_profile') }}" class="needs-validation" novalidate>
+                    <div class="row g-4">
+                        <!-- Informations Personnelles -->
+                        <div class="col-md-6">
+                            <div class="glass-card h-100">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center mb-4">
+                                        <div class="feature-icon-small d-inline-flex align-items-center justify-content-center text-primary fs-4 rounded-3 me-3">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0 gradient-text">Informations Personnelles</h5>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="first_name" class="modern-label">Prénom</label>
+                                        <div class="modern-input-group">
+                                            <i class="fas fa-user input-icon"></i>
+                                            <input type="text" class="modern-input" id="first_name" name="first_name" 
+                                                value="{{ form_data.get('first_name', '') }}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="last_name" class="modern-label">Nom</label>
+                                        <div class="modern-input-group">
+                                            <i class="fas fa-user-tag input-icon"></i>
+                                            <input type="text" class="modern-input" id="last_name" name="last_name" 
+                                                value="{{ form_data.get('last_name', '') }}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="date_of_birth" class="modern-label">Date de Naissance</label>
+                                        <div class="modern-input-group">
+                                            <i class="fas fa-calendar input-icon"></i>
+                                            <input type="date" class="modern-input" id="date_of_birth" name="date_of_birth" 
+                                                value="{{ form_data.get('date_of_birth', '') }}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="email" class="modern-label">Email</label>
+                                        <div class="modern-input-group">
+                                            <i class="fas fa-envelope input-icon"></i>
+                                            <input type="email" class="modern-input" id="email" name="email" 
+                                                value="{{ form_data.get('email', '') }}" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informations Professionnelles -->
+                        <div class="col-md-6">
+                            <div class="glass-card h-100">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center mb-4">
+                                        <div class="feature-icon-small d-inline-flex align-items-center justify-content-center text-primary fs-4 rounded-3 me-3">
+                                            <i class="fas fa-briefcase"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0 gradient-text">Informations Professionnelles</h5>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="professional_number" class="modern-label">Numéro Professionnel</label>
+                                        <div class="modern-input-group">
+                                            <i class="fas fa-id-card input-icon"></i>
+                                            <input type="text" class="modern-input" id="professional_number" name="professional_number" 
+                                                value="{{ form_data.get('professional_number', '') }}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="job_function" class="modern-label">Fonction</label>
+                                        <div class="modern-input-group">
+                                            <i class="fas fa-user-tie input-icon"></i>
+                                            <input type="text" class="modern-input" id="job_function" name="job_function" 
+                                                value="{{ form_data.get('job_function', '') }}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="recruitment_date" class="modern-label">Date de Recrutement</label>
+                                        <div class="modern-input-group">
+                                            <i class="fas fa-calendar-check input-icon"></i>
+                                            <input type="date" class="modern-input" id="recruitment_date" name="recruitment_date" 
+                                                value="{{ form_data.get('recruitment_date', '') }}" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="glass-card">
+                                <div class="card-body p-4">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="history.back()">
+                                            <i class="fas fa-arrow-left me-2"></i>Retour
+                                        </button>
+                                        <button type="submit" class="btn btn-primary modern-btn">
+                                            <i class="fas fa-save me-2"></i>Enregistrer le Profil
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Add new background styles */
+.background-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    min-height: 105vh;
+    width: 100%;
+    background-color: #f6f5ffe7;
+    margin-top: 56px; /* Height of navbar */
+}
+
+.content-wrapper {
+    padding: 2rem;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background-image: url('/static/images/ona_notext.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: left center;
+    opacity: 0.2;
+    pointer-events: none;
+}
+
+/* Existing styles */
+:root {
+    --primary-color: #2196F3;
+    --primary-dark: #1976D2;
+    --primary-light: #BBDEFB;
+    --secondary-color: #607D8B;
+    --success-color: #4CAF50;
+    --warning-color: #FFC107;
+    --danger-color: #F44336;
+}
+
+.gradient-text {
+    background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 1rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 48px 0 rgba(31, 38, 135, 0.2);
+}
+
+.feature-icon-small {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(45deg, rgba(33, 150, 243, 0.1), rgba(33, 150, 243, 0.2));
+    border-radius: 0.5rem;
+}
+
+.modern-label {
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.modern-input-group {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #757575;
+    z-index: 1;
+}
+
+.modern-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.75rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    background-color: #fff;
+}
+
+.modern-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.15);
+    outline: none;
+}
+
+.modern-btn {
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(45deg, var(--primary-dark), var(--primary-color));
+    transform: translateY(-2px);
+}
+
+.btn-outline-secondary {
+    border: 1px solid #e0e0e0;
+    color: #757575;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #f5f5f5;
+    color: #2c3e50;
+}
+
+/* Validation styles */
+.was-validated .modern-input:valid {
+    border-color: var(--success-color);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%234CAF50' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.was-validated .modern-input:invalid {
+    border-color: var(--danger-color);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+</style>
+
+<script>
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %}

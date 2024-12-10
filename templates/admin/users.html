@@ -1,0 +1,938 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion des Utilisateurs{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- En-tête -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-users-gear me-2 text-primary"></i>
+                    <span class="gradient-text">Gestion des Utilisateurs</span>
+                </h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Tableau de Bord</a></li>
+                        <li class="breadcrumb-item active">Gestion des Utilisateurs</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Filtres -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="glass-card">
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="search-wrapper">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" id="userSearch" class="form-control modern-input" 
+                                       placeholder="Rechercher un utilisateur...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <select id="roleFilter" class="form-select modern-select">
+                                <option value="">Tous les rôles</option>
+                                <option value="Admin">Administrateur</option>
+                                <option value="Employeur DG">Employeur DG</option>
+                                <option value="Employeur de Zone">Employeur de Zone</option>
+                                <option value="Employeur de l'unité">Employeur de l'unité</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select id="zoneFilter" class="form-select modern-select">
+                                <option value="">Toutes les zones</option>
+                                {% for zone in zones %}
+                                <option value="{{ zone.name }}">{{ zone.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select id="unitFilter" class="form-select modern-select">
+                                <option value="">Toutes les unités</option>
+                                {% for unit in units %}
+                                <option value="{{ unit.name }}">{{ unit.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-primary modern-btn flex-grow-1" data-bs-toggle="modal" data-bs-target="#newUserModal">
+                                    <i class="fas fa-user-plus me-2"></i> Nouvel Utilisateur
+                                </button>
+                                <button class="btn btn-outline-primary modern-btn" id="resetFilters">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Tableau -->
+    <div class="row">
+        <div class="col-12">
+            <div class="glass-card">
+                <div class="card-body p-0">
+                    <div class="table-responsive modern-table">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-3" onclick="sortTable(0)">
+                                        <div class="d-flex align-items-center">
+                                            Utilisateur <i class="fas fa-sort ms-2"></i>
+                                        </div>
+                                    </th>
+                                    <th class="px-4 py-3" onclick="sortTable(1)">
+                                        <div class="d-flex align-items-center">
+                                            Rôle <i class="fas fa-sort ms-2"></i>
+                                        </div>
+                                    </th>
+                                    <th class="px-4 py-3" onclick="sortTable(2)">
+                                        <div class="d-flex align-items-center">
+                                            Zone <i class="fas fa-sort ms-2"></i>
+                                        </div>
+                                    </th>
+                                    <th class="px-4 py-3" onclick="sortTable(3)">
+                                        <div class="d-flex align-items-center">
+                                            Unité <i class="fas fa-sort ms-2"></i>
+                                        </div>
+                                    </th>
+                                    <th class="px-4 py-3">Incidents</th>
+                                    <th class="px-4 py-3 text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr class="border-bottom">
+                                    <td class="px-4 py-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="modern-avatar">
+                                                {{ user.username[:2].upper() }}
+                                            </div>
+                                            <div class="ms-3">
+                                                <div class="fw-semibold">{{ user.username }}</div>
+                                                {% if user.nickname %}
+                                                <small class="text-muted">{{ user.nickname }}</small>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span class="modern-badge 
+                                            {% if user.role == 'Admin' %}badge-danger{% endif %}
+                                            {% if user.role == 'Employeur DG' %}badge-warning{% endif %}
+                                            {% if user.role == 'Employeur de Zone' %}badge-success{% endif %}
+                                            {% if user.role == 'Employeur de l\'unité' %}badge-info{% endif %}">
+                                            {{ user.role }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        {% if user.zone_id %}
+                                            {% set zone = zones|selectattr('id', 'eq', user.zone_id)|first %}
+                                            <span class="modern-badge-primary">
+                                                {{ zone.name if zone else '-' }}
+                                            </span>
+                                        {% elif user.unit and user.unit.zone %}
+                                            <span class="modern-badge-primary">
+                                                {{ user.unit.zone.name }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        {% if user.unit_id %}
+                                            {% set unit = units|selectattr('id', 'eq', user.unit_id)|first %}
+                                            <span class="modern-badge-secondary">
+                                                {{ unit.name if unit else '-' }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span class="modern-badge-info rounded-pill">
+                                            {{ user.incidents|length }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3 text-end">
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-light-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                Actions
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editUserModal{{ user.id }}">
+                                                        <i class="fas fa-edit me-2"></i>Modifier
+                                                    </a>
+                                                </li>
+                                                {% if user.id != current_user.id %}
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ user.id }}">
+                                                        <i class="fas fa-trash-alt me-2"></i>Supprimer
+                                                    </a>
+                                                </li>
+                                                {% endif %}
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New User Modal -->
+<div class="modal fade" id="newUserModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-user-plus me-2 text-primary"></i>
+                    Nouvel Utilisateur
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newUserForm" method="POST" action="{{ url_for('create_user') }}" class="needs-validation" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="username" class="form-label">Nom d'utilisateur</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                            <div class="invalid-feedback">
+                                Veuillez entrer un nom d'utilisateur.
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="nickname" class="form-label">Surnom (affiché dans la barre de navigation)</label>
+                            <input type="text" class="form-control" id="nickname" name="nickname" required>
+                            <div class="invalid-feedback">
+                                Veuillez entrer un surnom.
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="password" class="form-label">Mot de passe</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback">
+                                Veuillez entrer un mot de passe.
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="role" class="form-label">Rôle</label>
+                            <select class="form-select" id="role" name="role" required onchange="toggleUnitFields(this)">
+                                <option value="">Sélectionnez un rôle</option>
+                                <option value="Admin">Administrateur</option>
+                                <option value="Employeur DG">Employeur DG</option>
+                                <option value="Employeur de Zone">Employeur de Zone</option>
+                                <option value="Employeur de l'unité">Employeur de l'unité</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Veuillez sélectionner un rôle.
+                            </div>
+                        </div>
+                        <div class="col-md-6 unit-field" style="display: none;">
+                            <label for="zone_id" class="form-label">Zone</label>
+                            <select class="form-select zone-select" id="zone_id" name="zone_id">
+                                <option value="">Sélectionnez une zone</option>
+                                {% for zone in zones %}
+                                <option value="{{ zone.id }}">{{ zone.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Veuillez sélectionner une zone.
+                            </div>
+                        </div>
+                        <div class="col-md-6 unit-field" style="display: none;">
+                            <label for="unit_id" class="form-label">Unité</label>
+                            <select class="form-select" id="unit_id" name="unit_id">
+                                <option value="">Sélectionnez une unité</option>
+                                {% for unit in units %}
+                                <option value="{{ unit.id }}" data-zone="{{ unit.zone_id }}">{{ unit.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Veuillez sélectionner une unité.
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="submit" form="newUserForm" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Créer l'utilisateur
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modals -->
+{% for user in users %}
+<div class="modal fade" id="editUserModal{{ user.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modifier l'Utilisateur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('edit_user', user_id=user.id) }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nom d'utilisateur *</label>
+                        <input type="text" name="username" class="form-control" value="{{ user.username }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Surnom (affiché dans la barre de navigation)</label>
+                        <input type="text" class="form-control" name="nickname" value="{{ user.nickname }}" placeholder="Surnom optionnel">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nouveau mot de passe</label>
+                        <input type="password" name="password" class="form-control">
+                        <small class="text-muted">Laisser vide pour conserver le mot de passe actuel</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rôle *</label>
+                        <select name="role" class="form-select" required>
+                            <option value="Admin" {% if user.role == 'Admin' %}selected{% endif %}>Administrateur</option>
+                            <option value="Employeur DG" {% if user.role == 'Employeur DG' %}selected{% endif %}>Employeur DG</option>
+                            <option value="Employeur de Zone" {% if user.role == 'Employeur de Zone' %}selected{% endif %}>Employeur de Zone</option>
+                            <option value="Employeur de l'unité" {% if user.role == 'Employeur de l\'unité' %}selected{% endif %}>Employeur de l'unité</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 unit-field">
+                        <label class="form-label">Zone</label>
+                        <select name="zone_id" class="form-select zone-select" required>
+                            <option value="">Sélectionner une zone</option>
+                            {% for zone in zones %}
+                            <option value="{{ zone.id }}" {% if user.unit and user.unit.zone_id == zone.id %}selected{% endif %}>{{ zone.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3 unit-field">
+                        <label class="form-label">Unité</label>
+                        <select name="unit_id" class="form-select unit-select" {% if not user.unit %}disabled{% endif %}>
+                            {% if user.unit %}
+                            {% for unit in units %}
+                            {% if unit.zone_id == user.unit.zone_id %}
+                            <option value="{{ unit.id }}" {% if user.unit_id == unit.id %}selected{% endif %}>{{ unit.name }}</option>
+                            {% endif %}
+                            {% endfor %}
+                            {% else %}
+                            <option value="">Sélectionner d'abord une zone</option>
+                            {% endif %}
+                        </select>
+                        <small class="text-muted">Requis pour les Employés Unité</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Mettre à jour</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete User Modal -->
+<div class="modal fade" id="deleteUserModal{{ user.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la Suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer l'utilisateur "{{ user.username }}" ?</p>
+                {% if user.incidents %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Cet utilisateur ne peut pas être supprimé car il a {{ user.incidents|length }} incident(s) associé(s).
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-danger" {% if user.incidents %}disabled{% endif %}>
+                        Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Toast Notification -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="toast" class="toast modern-toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <i class="fas fa-info-circle me-2 text-primary"></i>
+            <strong class="me-auto">Notification</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Fermer"></button>
+        </div>
+        <div class="toast-body"></div>
+    </div>
+</div>
+
+<style>
+:root {
+    --primary-color: #2196F3;
+    --primary-dark: #1976D2;
+    --primary-light: #BBDEFB;
+    --secondary-color: #607D8B;
+    --success-color: #4CAF50;
+    --warning-color: #FFC107;
+    --danger-color: #F44336;
+}
+
+.gradient-text {
+    background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 1rem;
+}
+
+.modern-input {
+    border: 1px solid #e0e0e0;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.modern-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.15);
+}
+
+.modern-select {
+    border: 1px solid #e0e0e0;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.modern-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.15);
+}
+
+.modern-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.modern-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.modern-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.badge-danger {
+    background-color: rgba(244, 67, 54, 0.1);
+    color: var(--danger-color);
+}
+
+.badge-warning {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: var(--warning-color);
+}
+
+.badge-success {
+    background-color: rgba(76, 175, 80, 0.1);
+    color: var(--success-color);
+}
+
+.modern-badge-primary {
+    background-color: rgba(33, 150, 243, 0.1);
+    color: var(--primary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.modern-badge-secondary {
+    background-color: rgba(96, 125, 139, 0.1);
+    color: var(--secondary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.modern-badge-info {
+    background-color: rgba(3, 169, 244, 0.1);
+    color: #03A9F4;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.search-wrapper {
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #757575;
+}
+
+.search-wrapper input {
+    padding-left: 2.5rem;
+}
+
+.modern-table {
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.modern-table th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+}
+
+.modern-table th i {
+    opacity: 0.5;
+    transition: all 0.3s ease;
+}
+
+.modern-table th:hover i {
+    opacity: 1;
+}
+
+.btn-light-primary {
+    background-color: rgba(33, 150, 243, 0.1);
+    color: var(--primary-color);
+    border: none;
+}
+
+.btn-light-primary:hover {
+    background-color: rgba(33, 150, 243, 0.2);
+    color: var(--primary-dark);
+}
+
+.modern-toast {
+    background: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+}
+</style>
+
+<script>
+// Existing scripts remain...
+// ...
+
+// New functions for enhanced functionality
+function sortTable(columnIndex) {
+    const table = document.querySelector('table');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const isAscending = table.querySelector('th:nth-child(' + (columnIndex + 1) + ')').classList.contains('asc');
+    
+    rows.sort((a, b) => {
+        const aValue = a.querySelector('td:nth-child(' + (columnIndex + 1) + ')').textContent.trim();
+        const bValue = b.querySelector('td:nth-child(' + (columnIndex + 1) + ')').textContent.trim();
+        return isAscending ? bValue.localeCompare(aValue) : aValue.localeCompare(bValue);
+    });
+    
+    table.querySelectorAll('th').forEach(th => th.classList.remove('asc', 'desc'));
+    table.querySelector('th:nth-child(' + (columnIndex + 1) + ')').classList.toggle(isAscending ? 'desc' : 'asc');
+    
+    tbody.innerHTML = '';
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+document.getElementById('resetFilters').addEventListener('click', function() {
+    document.getElementById('userSearch').value = '';
+    document.getElementById('roleFilter').value = '';
+    document.getElementById('zoneFilter').value = '';
+    document.getElementById('unitFilter').value = '';
+    updateUnitFilter();
+    filterUsers();
+});
+
+// Initialize tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+
+// Enhanced filter function
+function filterUsers() {
+    const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+    const roleFilter = document.getElementById('roleFilter').value;
+    const zoneFilter = document.getElementById('zoneFilter').value;
+    const unitFilter = document.getElementById('unitFilter').value;
+    const rows = document.querySelectorAll('tbody tr');
+
+    rows.forEach(row => {
+        const username = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+        const role = row.querySelector('td:nth-child(2)').textContent.trim();
+        const zone = row.querySelector('td:nth-child(3)').textContent.trim();
+        const unit = row.querySelector('td:nth-child(4)').textContent.trim();
+
+        const matchesSearch = username.includes(searchTerm);
+        const matchesRole = !roleFilter || role === roleFilter;
+        const matchesZone = !zoneFilter || zone === zoneFilter;
+        const matchesUnit = !unitFilter || unit === unitFilter;
+
+        row.style.display = matchesSearch && matchesRole && matchesZone && matchesUnit ? '' : 'none';
+    });
+}
+
+// Function to update unit filter based on selected zone
+function updateUnitFilter() {
+    const zoneFilter = document.getElementById('zoneFilter');
+    const unitFilter = document.getElementById('unitFilter');
+    const selectedZone = zoneFilter.value;
+
+    // Reset unit filter
+    unitFilter.innerHTML = '<option value="">Toutes les unités</option>';
+
+    if (selectedZone) {
+        // Filter units by selected zone
+        const units = Array.from(document.querySelectorAll('tbody tr')).map(row => {
+            const zone = row.querySelector('td:nth-child(3)').textContent.trim();
+            const unit = row.querySelector('td:nth-child(4)').textContent.trim();
+            return { zone, unit };
+        }).filter(item => item.zone === selectedZone && item.unit !== '-');
+
+        // Add unique units to filter
+        [...new Set(units.map(item => item.unit))].sort().forEach(unit => {
+            unitFilter.innerHTML += `<option value="${unit}">${unit}</option>`;
+        });
+    } else {
+        // Show all units if no zone is selected
+        {% for unit in units %}
+        unitFilter.innerHTML += `<option value="{{ unit.name }}">{{ unit.name }}</option>`;
+        {% endfor %}
+    }
+}
+
+// Add event listeners for enhanced filtering
+document.getElementById('userSearch').addEventListener('input', filterUsers);
+document.getElementById('roleFilter').addEventListener('change', filterUsers);
+document.getElementById('zoneFilter').addEventListener('change', function() {
+    updateUnitFilter();
+    filterUsers();
+});
+document.getElementById('unitFilter').addEventListener('change', filterUsers);
+
+document.getElementById('resetFilters').addEventListener('click', function() {
+    document.getElementById('userSearch').value = '';
+    document.getElementById('roleFilter').value = '';
+    document.getElementById('zoneFilter').value = '';
+    document.getElementById('unitFilter').value = '';
+    updateUnitFilter();
+    filterUsers();
+});
+
+// Initialize unit filter
+document.addEventListener('DOMContentLoaded', function() {
+    updateUnitFilter();
+});
+
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('toast');
+    const toastBody = toast.querySelector('.toast-body');
+    toastBody.textContent = message;
+    
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+}
+
+// Function to update units based on selected zone
+function updateUnits(zoneSelect) {
+    const unitSelect = zoneSelect.closest('.modal-content').querySelector('.unit-select');
+    const zoneId = zoneSelect.value;
+    
+    // Reset unit select
+    unitSelect.innerHTML = '<option value="">Sélectionner une unité</option>';
+    
+    if (!zoneId) {
+        unitSelect.innerHTML = '<option value="">Sélectionner d\'abord une zone</option>';
+        return;
+    }
+
+    fetch(`/get_units_by_zone/${zoneId}`)
+        .then(response => response.json())
+        .then(units => {
+            unitSelect.innerHTML = '<option value="">Sélectionner une unité</option>';
+            units.forEach(unit => {
+                unitSelect.innerHTML += `<option value="${unit.id}">${unit.name}</option>`;
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching units:', error);
+            unitSelect.innerHTML = '<option value="">Erreur lors du chargement des unités</option>';
+        });
+}
+
+// Add event listeners for all zone selects in modals
+document.addEventListener('DOMContentLoaded', function() {
+    const zoneSelects = document.querySelectorAll('.zone-select');
+    zoneSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            updateUnits(this);
+        });
+    });
+});
+
+// Function to toggle unit fields based on role
+function toggleUnitFields(roleSelect) {
+    const unitFields = document.querySelectorAll('.unit-field');
+    const zoneSelect = document.getElementById('zone_id');
+    const unitSelect = document.getElementById('unit_id');
+    
+    // Reset required attributes and values
+    zoneSelect.required = false;
+    unitSelect.required = false;
+    zoneSelect.value = '';
+    unitSelect.value = '';
+    
+    // Hide all unit fields initially
+    unitFields.forEach(field => field.style.display = 'none');
+    
+    // Show relevant fields based on role
+    switch(roleSelect.value) {
+        case 'Employeur de Zone':
+            unitFields[0].style.display = 'block'; // Show zone field only
+            zoneSelect.required = true;
+            break;
+        case 'Employeur de l\'unité':
+            unitFields.forEach(field => field.style.display = 'block'); // Show both zone and unit fields
+            zoneSelect.required = true;
+            unitSelect.required = true;
+            break;
+    }
+}
+
+// Function to update units based on selected zone
+document.getElementById('zone_id').addEventListener('change', function() {
+    const unitSelect = document.getElementById('unit_id');
+    const selectedZone = this.value;
+    
+    // Reset unit selection
+    unitSelect.value = '';
+    
+    // Hide all units first
+    Array.from(unitSelect.options).forEach(option => {
+        if (option.value === '') return; // Skip the placeholder option
+        const zoneId = option.getAttribute('data-zone');
+        if (zoneId === selectedZone) {
+            option.style.display = '';
+            option.disabled = false;
+        } else {
+            option.style.display = 'none';
+            option.disabled = true;
+        }
+    });
+});
+
+// Form validation before submission
+document.getElementById('newUserForm').addEventListener('submit', function(event) {
+    if (!this.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    
+    const role = document.getElementById('role').value;
+    const zoneSelect = document.getElementById('zone_id');
+    const unitSelect = document.getElementById('unit_id');
+    
+    if (role === 'Employeur de Zone' && !zoneSelect.value) {
+        event.preventDefault();
+        zoneSelect.classList.add('is-invalid');
+        return false;
+    }
+    
+    if (role === 'Employeur de l\'unité') {
+        if (!zoneSelect.value) {
+            event.preventDefault();
+            zoneSelect.classList.add('is-invalid');
+            return false;
+        }
+        if (!unitSelect.value) {
+            event.preventDefault();
+            unitSelect.classList.add('is-invalid');
+            return false;
+        }
+    }
+    
+    this.classList.add('was-validated');
+});
+
+// Function to update units based on selected zone
+function updateUnits(zoneSelect) {
+    const unitSelect = zoneSelect.closest('.modal-content').querySelector('.unit-select');
+    const zoneId = zoneSelect.value;
+    
+    if (!zoneId) {
+        unitSelect.innerHTML = '<option value="">Sélectionner d\'abord une zone</option>';
+        return;
+    }
+
+    fetch(`/get_units_by_zone/${zoneId}`)
+        .then(response => response.json())
+        .then(data => {
+            unitSelect.innerHTML = '<option value="">Sélectionner une unité</option>';
+            data.forEach(unit => {
+                unitSelect.innerHTML += `<option value="${unit.id}">${unit.name}</option>`;
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching units:', error);
+            unitSelect.innerHTML = '<option value="">Erreur lors du chargement des unités</option>';
+        });
+}
+
+// Add event listeners when document is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Add listeners for role selects
+    const roleSelects = document.querySelectorAll('select[name="role"]');
+    roleSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            toggleUnitFields(this);
+        });
+        // Initialize fields on load
+        toggleUnitFields(select);
+    });
+
+    // Add listeners for zone selects
+    const zoneSelects = document.querySelectorAll('.zone-select');
+    zoneSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            updateUnits(this);
+        });
+    });
+});
+
+// Function to toggle password visibility
+document.getElementById('togglePassword').addEventListener('click', function() {
+    const passwordInput = document.getElementById('password');
+    const icon = this.querySelector('i');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+});
+
+// Function to update units based on selected zone
+document.getElementById('zone_id').addEventListener('change', function() {
+    const unitSelect = document.getElementById('unit_id');
+    const selectedZone = this.value;
+    
+    // Hide all units first
+    Array.from(unitSelect.options).forEach(option => {
+        if (option.value === '') return; // Skip the placeholder option
+        const zoneId = option.getAttribute('data-zone');
+        option.style.display = zoneId === selectedZone ? '' : 'none';
+    });
+    
+    // Reset unit selection
+    unitSelect.value = '';
+});
+
+// Function to update units based on selected zone
+function updateUnits(zoneSelect) {
+    const unitSelect = zoneSelect.closest('.modal-content').querySelector('.unit-select');
+    const zoneId = zoneSelect.value;
+    
+    if (!zoneId) {
+        unitSelect.innerHTML = '<option value="">Sélectionner d\'abord une zone</option>';
+        return;
+    }
+
+    fetch(`/get_units_by_zone/${zoneId}`)
+        .then(response => response.json())
+        .then(units => {
+            unitSelect.innerHTML = '<option value="">Sélectionner une unité</option>';
+            units.forEach(unit => {
+                unitSelect.innerHTML += `<option value="${unit.id}">${unit.name}</option>`;
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching units:', error);
+            unitSelect.innerHTML = '<option value="">Erreur lors du chargement des unités</option>';
+        });
+}
+
+// Add event listeners when document is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Add listeners for role selects
+    const roleSelects = document.querySelectorAll('select[name="role"]');
+    roleSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            toggleUnitFields(this);
+        });
+        // Initialize fields on load
+        toggleUnitFields(select);
+    });
+
+    // Add listeners for zone selects
+    const zoneSelects = document.querySelectorAll('.zone-select');
+    zoneSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            updateUnits(this);
+        });
+    });
+});
+</script>
+
+{% endblock %}
